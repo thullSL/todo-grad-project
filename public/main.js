@@ -76,6 +76,9 @@ function reloadTodoList() {
             var completeBox = document.createElement("input");
             completeBox.type = "checkbox";
             completeBox.checked = todo.isComplete;
+            if (todo.isComplete) {
+                listItem.className += "completed";
+            }
             completeBox.className = "isCompleteCheckbox";
             completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
 
@@ -87,9 +90,9 @@ function reloadTodoList() {
     });
 }
 
-function updateTodo(element, todoId, callback){
+function updateTodo(element, todoId, callback) {
     var updateRequest = new XMLHttpRequest();
-    getTodo(todoId, function(todo){
+    getTodo(todoId, function(todo) {
         updateRequest.open("PUT", "/api/todo/" + todo.id);
         updateRequest.setRequestHeader("Content-type", "application/json");
         var d = element.checked;
@@ -97,14 +100,19 @@ function updateTodo(element, todoId, callback){
             title: todo.title,
             isComplete: element.checked
         }));
-        updateRequest.onload = function(){
-            if (this.status == 200) {
+        updateRequest.onload = function() {
+            if (this.status === 200) {
+                if (element.checked) {
+                    element.parentNode.className += "completed";
+                } else {
+                    element.parentNode.className = element.parentNode.className.replace("completed", "");
+                }
                 callback();
-            }else{
+            } else {
                 error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
             }
-        }
-    })
+        };
+    });
 }
 
 function deleteTodo(todoId, callback) {
