@@ -92,13 +92,15 @@ describe("server", function() {
                 request.put({
                     url: todoListUrl + "/0",
                     json: {
-                        title: "This is an updated TODO item"
+                        title: "This is an updated TODO item",
+                        isComplete: true
                     }
                 }, function(error, response) {
                     assert.equal(response.statusCode, 200);
                     request.get(todoListUrl, function(error, response, body) {
                         assert.deepEqual(JSON.parse(body), [{
                             title: "This is an updated TODO item",
+                            isComplete: true,
                             id: "0"
                         }]);
                         done();
