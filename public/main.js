@@ -49,30 +49,32 @@ function reloadTodoList() {
     todoListPlaceholder.style.display = "block";
     getTodoList(function(todos) {
         todoListPlaceholder.style.display = "none";
+        var i = 0;
         todos.forEach(function(todo) {
             var listItem = document.createElement("li");
             listItem.textContent = todo.title;
-            var deleteButton = document.createElement("button")
-
-            deleteButton.setAttribute("onClick","deleteTodo(" + todo.id + ", reloadTodoList)");
+            var deleteButton = document.createElement("button");
+            deleteButton.id = "deleteTODO" + i;
+            deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
             deleteButton.textContent = "X";
             deleteButton.className  = " deleteButton";
             listItem.appendChild(deleteButton);
             todoList.appendChild(listItem);
+            i++;
         });
     });
 }
 
-function deleteTodo(todoId, callback){
+function deleteTodo(todoId, callback) {
     var deleteRequest = new XMLHttpRequest();
     deleteRequest.open("DELETE", "/api/todo/" + todoId);
-    deleteRequest.onload = function(){
-         if (this.status === 200) {
+    deleteRequest.onload = function() {
+        if (this.status === 200) {
             callback();
         } else {
             error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
         }
-    }
+    };
     deleteRequest.send();
 }
 
