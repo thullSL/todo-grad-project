@@ -26,6 +26,18 @@ module.exports = function(port, middleware, callback) {
     });
 
     // Read
+    app.get("/api/todo/:id", function(req, res) {
+        var id = req.params.id;
+        var todo = getTodo(id);
+        if(todo) {
+            res.json(todo);
+            res.sendStatus(200);
+        }else{
+            res.sendStatus(404);
+        }
+    });
+
+    // Read
     app.get("/api/todo", function(req, res) {
         res.json(todos);
     });
