@@ -29,10 +29,10 @@ module.exports = function(port, middleware, callback) {
     app.get("/api/todo/:id", function(req, res) {
         var id = req.params.id;
         var todo = getTodo(id);
-        if(todo) {
+        if (todo) {
             res.json(todo);
             res.sendStatus(200);
-        }else{
+        }else {
             res.sendStatus(404);
         }
     });
@@ -61,7 +61,7 @@ module.exports = function(port, middleware, callback) {
         var id  = req.params.id;
         var todo = getTodo(id);
         if (todo) {
-            if (req.body.title !== 'undefined' && req.body.isComplete !== 'undefined') {
+            if (typeof req.body.title !== "undefined" && typeof req.body.isComplete !== "undefined") {
                 todo.title = req.body.title;
                 todo.isComplete = req.body.isComplete;
                 res.sendStatus(200);
