@@ -80,7 +80,7 @@ function reloadTodoList() {
             completeBox.checked = todo.isComplete;
             if (todo.isComplete) {
                 listItem.className += "completed";
-            }else{
+            }else {
                 todoCount++;
             }
             completeBox.className = "isCompleteCheckbox";
