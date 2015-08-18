@@ -1,3 +1,4 @@
+/*global Promise*/
 var todoList = document.getElementById("todo-list");
 var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
@@ -134,6 +135,18 @@ function deleteTodo(todoId, callback) {
         }
     };
     deleteRequest.send();
+}
+
+function deleteCompleted() {
+    var promise = new Promise(function(resolve, reject) {
+        todosLocal.forEach(function(todo) {
+            if (todo.isComplete) {
+                deleteTodo(todo.id);
+            }
+        });
+    });
+    promise.then(reloadTodoList);
+    reloadTodoList();
 }
 
 reloadTodoList();
