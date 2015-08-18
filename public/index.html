@@ -20,6 +20,12 @@
             </form>
             <div id="error"></div>
         </section>
+        <div class="filtration">
+            <legend>Filter By</legend>
+            <input type="radio" name="filter" value="all" onClick="filter(this.value)" checked/>All<br />
+            <input type="radio" name="filter" value="active" onClick="filter(this.value)" />Active<br />
+            <input type="radio" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
+        </div>
         <script type="text/javascript" src="main.js"></script>
     </body>
 </html>
