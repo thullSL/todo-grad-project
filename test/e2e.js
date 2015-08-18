@@ -28,8 +28,8 @@ testing.describe("end to end", function() {
         testing.it("displays an error if the request fails", function() {
             helpers.setupErrorRoute("get", "/api/todo");
             helpers.navigateToSite();
-            helpers.getErrorText().then(function(text) {
-                assert.equal(text, "Failed to get list. Server returned 500 - Internal Server Error");
+            helpers.getErrorText().then(function(elements) {
+                assert.equal(elements.length, 1);
             });
         });
     });
@@ -52,8 +52,8 @@ testing.describe("end to end", function() {
             helpers.setupErrorRoute("post", "/api/todo");
             helpers.navigateToSite();
             helpers.addTodo("New todo item");
-            helpers.getErrorText().then(function(text) {
-                assert.equal(text, "Failed to create item. Server returned 500 - Internal Server Error");
+            helpers.getErrorText().then(function(elements) {
+                assert.equal(elements.length, 1);
             });
         });
         testing.it("can be done multiple times", function() {
