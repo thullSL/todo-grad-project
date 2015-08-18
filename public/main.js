@@ -4,7 +4,7 @@ var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var error = document.getElementById("error");
 var todoCount = 0;
-
+var todosLocal = [];
 form.onsubmit = function(event) {
     var title = todoTitle.value;
     createTodo(title, function() {
@@ -62,10 +62,11 @@ function reloadTodoList() {
     }
     todoListPlaceholder.style.display = "block";
     getTodoList(function(todos) {
+        todosLocal = todos;
         todoListPlaceholder.style.display = "none";
         todoCount = 0;
         var i = 0;
-        todos.forEach(function(todo) {
+        todosLocal.forEach(function(todo) {
             var listItem = document.createElement("li");
             listItem.textContent = todo.title;
 
@@ -95,29 +96,36 @@ function reloadTodoList() {
     });
 }
 
+function findTodo(id) {
+    for (var i in todosLocal) {
+        if (todosLocal[i].id === id.toString()) {
+            return todosLocal[i];
+        }
+    }
+}
+
 function updateTodo(element, todoId, callback) {
     var updateRequest = new XMLHttpRequest();
-    getTodo(todoId, function(todo) {
-        updateRequest.open("PUT", "/api/todo/" + todo.id);
-        updateRequest.setRequestHeader("Content-type", "application/json");
-        var d = element.checked;
-        updateRequest.send(JSON.stringify({
-            title: todo.title,
-            isComplete: element.checked
-        }));
-        updateRequest.onload = function() {
-            if (this.status === 200) {
-                if (element.checked) {
-                    element.parentNode.className += "completed";
-                } else {
-                    element.parentNode.className = element.parentNode.className.replace("completed", "");
-                }
-                callback();
+    var  todo = findTodo(todoId);
+    updateRequest.open("PUT", "/api/todo/" + todo.id);
+    updateRequest.setRequestHeader("Content-type", "application/json");
+    var d = element.checked;
+    updateRequest.send(JSON.stringify({
+        title: todo.title,
+        isComplete: element.checked
+    }));
+    updateRequest.onload = function() {
+        if (this.status === 200) {
+            if (element.checked) {
+                element.parentNode.className += "completed";
             } else {
-                error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
+                element.parentNode.className = element.parentNode.className.replace("completed", "");
             }
-        };
-    });
+            callback();
+        } else {
+            error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
+        }
+    };
 }
 
 function deleteTodo(todoId, callback) {

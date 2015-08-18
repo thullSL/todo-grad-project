@@ -31,7 +31,6 @@ module.exports = function(port, middleware, callback) {
         var todo = getTodo(id);
         if (todo) {
             res.json(todo);
-            res.sendStatus(200);
         }else {
             res.sendStatus(404);
         }
@@ -61,7 +60,8 @@ module.exports = function(port, middleware, callback) {
         var id  = req.params.id;
         var todo = getTodo(id);
         if (todo) {
-            if (typeof req.body.title !== "undefined" && typeof req.body.isComplete !== "undefined") {
+            // console.log()
+            if (req.body.title !== undefined &&  req.body.isComplete !== undefined) {
                 todo.title = req.body.title;
                 todo.isComplete = req.body.isComplete;
                 res.sendStatus(200);
