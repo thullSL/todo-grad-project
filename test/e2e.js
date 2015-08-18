@@ -86,5 +86,20 @@ testing.describe("end to end", function() {
             });
         });
     });
+    testing.describe("counting completed iems", function() {
+        testing.it("Count is 0 when 0 items", function() {
+            helpers.navigateToSite();
+            helpers.getCountDiv().then(function(text) {
+                assert.equal(text, "Total ToDos left to do: 0");
+            });
+        });
+        testing.it("Counts an item", function() {
+            helpers.navigateToSite();
+            helpers.addTodo("New todo item");
+            helpers.getCountDiv().then(function(text) {
+                assert.equal(text, "Total ToDos left to do: 1");
+            });
+        });
+    });
 });
 

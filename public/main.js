@@ -3,6 +3,7 @@ var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var error = document.getElementById("error");
+var todoCount = 0;
 
 form.onsubmit = function(event) {
     var title = todoTitle.value;
@@ -42,6 +43,19 @@ function getTodoList(callback) {
     createRequest.send();
 }
 
+function getTodo(id, callback) {
+    var createRequest = new XMLHttpRequest();
+    createRequest.open("GET", "/api/todo/" + id);
+    createRequest.onload = function() {
+        if (this.status === 200) {
+            callback(JSON.parse(this.responseText));
+        } else {
+            error.textContent = "Failed to get list. Server returned " + this.status + " - " + this.responseText;
+        }
+    };
+    createRequest.send();
+}
+
 function reloadTodoList() {
     while (todoList.firstChild) {
         todoList.removeChild(todoList.firstChild);
@@ -49,19 +63,60 @@ function reloadTodoList() {
     todoListPlaceholder.style.display = "block";
     getTodoList(function(todos) {
         todoListPlaceholder.style.display = "none";
+        todoCount = 0;
         var i = 0;
         todos.forEach(function(todo) {
             var listItem = document.createElement("li");
             listItem.textContent = todo.title;
+
             var deleteButton = document.createElement("button");
             deleteButton.id = "deleteTODO" + i;
             deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
             deleteButton.textContent = "X";
-            deleteButton.className  = " deleteButton";
+            deleteButton.className  = "deleteButton";
+
+            var completeBox = document.createElement("input");
+            completeBox.type = "checkbox";
+            completeBox.checked = todo.isComplete;
+            if (todo.isComplete) {
+                listItem.className += "completed";
+            }else {
+                todoCount++;
+            }
+            completeBox.className = "isCompleteCheckbox";
+            completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
+
             listItem.appendChild(deleteButton);
+            listItem.appendChild(completeBox);
             todoList.appendChild(listItem);
             i++;
         });
+        document.getElementById("count-label").textContent = "Total ToDos left to do: " + todoCount.toString();
+    });
+}
+
+function updateTodo(element, todoId, callback) {
+    var updateRequest = new XMLHttpRequest();
+    getTodo(todoId, function(todo) {
+        updateRequest.open("PUT", "/api/todo/" + todo.id);
+        updateRequest.setRequestHeader("Content-type", "application/json");
+        var d = element.checked;
+        updateRequest.send(JSON.stringify({
+            title: todo.title,
+            isComplete: element.checked
+        }));
+        updateRequest.onload = function() {
+            if (this.status === 200) {
+                if (element.checked) {
+                    element.parentNode.className += "completed";
+                } else {
+                    element.parentNode.className = element.parentNode.className.replace("completed", "");
+                }
+                callback();
+            } else {
+                error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
+            }
+        };
     });
 }
 
