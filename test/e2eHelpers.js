@@ -86,6 +86,13 @@ module.exports.deleteTodo = function(index) {
     button.click();
 };
 
+module.exports.getCountDiv = function(index) {
+    var todoListPlaceholder = driver.findElement(webdriver.By.id("todo-list-placeholder"));
+    driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
+    var countDiv =  driver.findElement(webdriver.By.css("#count-label")).getText();
+    return countDiv;
+};
+
 module.exports.setupErrorRoute = function(action, route) {
     if (action === "get") {
         router.get(route, function(req, res) {

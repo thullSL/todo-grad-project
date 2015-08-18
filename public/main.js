@@ -4,7 +4,7 @@ var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var messagesDiv = document.getElementById("messages");
-var messageDialogs = [];
+var incompleteTodoCount = 0;
 var todosLocal = [];
 form.onsubmit = function(event) {
     var title = todoTitle.value;
@@ -68,6 +68,7 @@ function reloadTodoList() {
     getTodoList(function(todos) {
         todosLocal = todos;
         todoListPlaceholder.style.display = "none";
+        incompleteTodoCount = 0;
         var i = 0;
         todosLocal.forEach(function(todo) {
             var listItem = document.createElement("li");
@@ -84,6 +85,8 @@ function reloadTodoList() {
             completeBox.checked = todo.isComplete;
             if (todo.isComplete) {
                 listItem.className += "completed";
+            }else {
+                incompleteTodoCount++;
             }
             completeBox.className = "isCompleteCheckbox";
             completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
@@ -93,6 +96,8 @@ function reloadTodoList() {
             todoList.appendChild(listItem);
             i++;
         });
+        document.getElementById("count-label").textContent = "Total ToDos left to do: " +
+                                                                incompleteTodoCount.toString();
     });
 }
 function renderMessageDialog(message, type) {
