@@ -3,7 +3,7 @@ var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var error = document.getElementById("error");
-var completedTodoCount = 0;
+var incompleteTodoCount = 0;
 var todosLocal = [];
 form.onsubmit = function(event) {
     var title = todoTitle.value;
@@ -64,7 +64,7 @@ function reloadTodoList() {
     getTodoList(function(todos) {
         todosLocal = todos;
         todoListPlaceholder.style.display = "none";
-        completedTodoCount = 0;
+        incompleteTodoCount = 0;
         var i = 0;
         todosLocal.forEach(function(todo) {
             var listItem = document.createElement("li");
@@ -82,7 +82,7 @@ function reloadTodoList() {
             if (todo.isComplete) {
                 listItem.className += "completed";
             }else {
-                completedTodoCount++;
+                incompleteTodoCount++;
             }
             completeBox.className = "isCompleteCheckbox";
             completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
@@ -92,7 +92,8 @@ function reloadTodoList() {
             todoList.appendChild(listItem);
             i++;
         });
-        document.getElementById("count-label").textContent = "Total ToDos left to do: " + completedTodoCount.toString();
+        document.getElementById("count-label").textContent = "Total ToDos left to do: " +
+                                                                incompleteTodoCount.toString();
     });
 }
 
