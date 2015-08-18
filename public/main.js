@@ -101,9 +101,7 @@ function reloadTodoList() {
     });
 }
 function renderMessageDialog(message, type) {
-    if (messagesDiv.disabled) {
-        messagesDiv.disabled = false;
-    }
+    messagesDiv.disabled = false;
     type = type === undefined ? "error" : type;
     var div = document.createElement("div");
     div.className = "dialog " + type;
