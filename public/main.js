@@ -91,9 +91,9 @@ function reloadTodoList() {
     });
 }
 
-function findTodo(id){
-    for(var i in todosLocal) {
-        if(todosLocal[i].id === id.toString()) {
+function findTodo(id) {
+    for (var i in todosLocal) {
+        if (todosLocal[i].id === id.toString()) {
             return todosLocal[i];
         }
     }
