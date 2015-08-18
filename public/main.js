@@ -124,6 +124,10 @@ function updateTodo(element, todoId, callback) {
     };
 }
 
+function echoHello() {
+    console.log("Hello");
+}
+
 function deleteTodo(todoId, callback) {
     var deleteRequest = new XMLHttpRequest();
     deleteRequest.open("DELETE", "/api/todo/" + todoId);

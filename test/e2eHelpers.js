@@ -78,11 +78,18 @@ module.exports.addTodo = function(text) {
     driver.findElement(webdriver.By.id("new-todo")).sendKeys(text);
     driver.findElement(webdriver.By.id("submit-todo")).click();
 };
+
 module.exports.deleteTodo = function(index) {
     var todoListPlaceholder = driver.findElement(webdriver.By.id("todo-list-placeholder"));
     driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
     var button =  driver.findElement(webdriver.By.id("deleteTODO" + index));
     button.click();
+};
+
+module.exports.setCompleted = function(id) {
+    var todoListPlaceholder = driver.findElement(webdriver.By.id("todo-list-placeholder"));
+    driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
+    driver.execute_script("echoHello()");
 };
 
 module.exports.setupErrorRoute = function(action, route) {
