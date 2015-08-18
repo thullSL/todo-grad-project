@@ -18,7 +18,10 @@
                 <input id="new-todo" placeholder="What needs to be done?" autofocus>
                 <input id="submit-todo" type="submit" value="Create">
             </form>
-            <div id="error"></div>
+            <div class="buttons">
+                <button onclick="deleteCompleted()">Delete Completed</button>
+            </div>
+            <div id="messages" disabled="true"></div>
         </section>
         <script type="text/javascript" src="main.js"></script>
     </body>
