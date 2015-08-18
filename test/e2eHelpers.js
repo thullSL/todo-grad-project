@@ -63,9 +63,9 @@ module.exports.getInputText = function() {
 };
 
 module.exports.getErrorText = function() {
-    var errorElement = driver.findElement(webdriver.By.id("error"));
-    driver.wait(webdriver.until.elementTextContains(errorElement, "Failed"), 5000);
-    return errorElement.getText();
+    var errorElement = driver.findElement(webdriver.By.id("messages"));
+    driver.wait(webdriver.until.elementIsEnabled(errorElement), 5000);
+    return driver.findElements(webdriver.By.css("#messages div"));
 };
 
 module.exports.getTodoList = function() {
@@ -84,6 +84,13 @@ module.exports.deleteTodo = function(index) {
     driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
     var button =  driver.findElement(webdriver.By.id("deleteTODO" + index));
     button.click();
+};
+
+module.exports.getCountDiv = function(index) {
+    var todoListPlaceholder = driver.findElement(webdriver.By.id("todo-list-placeholder"));
+    driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
+    var countDiv =  driver.findElement(webdriver.By.css("#count-label")).getText();
+    return countDiv;
 };
 
 module.exports.setupErrorRoute = function(action, route) {
