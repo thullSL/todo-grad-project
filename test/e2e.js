@@ -86,7 +86,7 @@ testing.describe("end to end", function() {
             });
         });
     });
-    testing.describe("counting completed iems", function() {
+    testing.describe("counting completed items", function() {
         testing.it("Count is 0 when 0 items", function() {
             helpers.navigateToSite();
             helpers.getCountDiv().then(function(text) {
