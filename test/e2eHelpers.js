@@ -86,12 +86,6 @@ module.exports.deleteTodo = function(index) {
     button.click();
 };
 
-module.exports.setCompleted = function(id) {
-    var todoListPlaceholder = driver.findElement(webdriver.By.id("todo-list-placeholder"));
-    driver.wait(webdriver.until.elementIsNotVisible(todoListPlaceholder), 5000);
-    driver.execute_script("echoHello()");
-};
-
 module.exports.setupErrorRoute = function(action, route) {
     if (action === "get") {
         router.get(route, function(req, res) {

@@ -86,13 +86,5 @@ testing.describe("end to end", function() {
             });
         });
     });
-    testing.describe("on delete all completed todos", function() {
-        testing.it("Deletes completed todos", function() {
-            helpers.navigateToSite();
-            helpers.addTodo("New todo item");
-            helpers.deleteTodo("0");
-            helpers.setCompleted(1);
-        });
-    });
 });
 
