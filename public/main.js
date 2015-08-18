@@ -4,6 +4,7 @@ var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var error = document.getElementById("error");
+var messageDialogs = [];
 var todosLocal = [];
 form.onsubmit = function(event) {
     var title = todoTitle.value;
@@ -129,24 +130,22 @@ function deleteTodo(todoId, callback) {
     deleteRequest.open("DELETE", "/api/todo/" + todoId);
     deleteRequest.onload = function() {
         if (this.status === 200) {
-            callback();
         } else {
             error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
         }
+        callback(this.status);
     };
     deleteRequest.send();
 }
 
 function deleteCompleted() {
-    var promise = new Promise(function(resolve, reject) {
-        todosLocal.forEach(function(todo) {
-            if (todo.isComplete) {
-                deleteTodo(todo.id);
-            }
-        });
+    var promises = [];
+    todosLocal.forEach(function(todo) {
+        if (todo.isComplete) {
+            promises.push(new Promise(function(resolve, reject) {deleteTodo(todo.id, resolve);}));
+        }
     });
-    promise.then(reloadTodoList);
-    reloadTodoList();
+    Promise.all(promises).then(reloadTodoList);
 }
 
 reloadTodoList();
