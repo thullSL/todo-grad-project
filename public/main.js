@@ -74,29 +74,7 @@ function reloadTodoList() {
         var promises = [];
         todosLocal.forEach(function(todo) {
             promises.push(new Promise(function(resolve, reject) {
-                var listItem = document.createElement("li");
-                listItem.textContent = todo.title;
-
-                var deleteButton = document.createElement("button");
-                deleteButton.id = "deleteTODO" + i;
-                deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
-                deleteButton.textContent = "X";
-                deleteButton.className  = "deleteButton";
-
-                var completeBox = document.createElement("input");
-                completeBox.type = "checkbox";
-                completeBox.checked = todo.isComplete;
-                if (todo.isComplete) {
-                    listItem.className += "completed";
-                }else {
-                    incompleteTodoCount++;
-                }
-                completeBox.className = "isCompleteCheckbox";
-                completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
-
-                listItem.appendChild(deleteButton);
-                listItem.appendChild(completeBox);
-                todoList.appendChild(listItem);
+                renderTodo(todo, i);
                 i++;
                 resolve();
             }));
@@ -107,6 +85,32 @@ function reloadTodoList() {
             filter(currentFilter);
         });
     });
+}
+
+function renderTodo(todo, i) {
+    var listItem = document.createElement("li");
+    listItem.textContent = todo.title;
+
+    var deleteButton = document.createElement("button");
+    deleteButton.id = "deleteTODO" + i;
+    deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
+    deleteButton.textContent = "X";
+    deleteButton.className  = "deleteButton";
+
+    var completeBox = document.createElement("input");
+    completeBox.type = "checkbox";
+    completeBox.checked = todo.isComplete;
+    if (todo.isComplete) {
+        listItem.className += "completed";
+    }else {
+        incompleteTodoCount++;
+    }
+    completeBox.className = "isCompleteCheckbox";
+    completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
+
+    listItem.appendChild(deleteButton);
+    listItem.appendChild(completeBox);
+    todoList.appendChild(listItem);
 }
 function renderMessageDialog(message, type) {
     messagesDiv.disabled = false;
@@ -167,7 +171,7 @@ function filter(type) {
     currentFilter = type;
     for (var i = 0; i < todoList.childNodes.length; i++) {
         var li = todoList.childNodes[i];
-        if ( (" " + li.className + " ").indexOf(" completed ") > -1) {
+        if ((" " + li.className + " ").indexOf(" completed ") > -1) {
             li.style.display = type === "active" ? "none" : "list-item";
         } else {
             li.style.display = type === "complete" ? "none" : "list-item";
