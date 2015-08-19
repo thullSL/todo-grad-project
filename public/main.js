@@ -3,7 +3,7 @@ var todoList = document.getElementById("todo-list");
 var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
-var error = document.getElementById("error");
+var messagesDiv = document.getElementById("messages");
 var incompleteTodoCount = 0;
 var todosLocal = [];
 var currentFilter = "all";
@@ -27,7 +27,8 @@ function createTodo(title, callback) {
         if (this.status === 201) {
             callback();
         } else {
-            error.textContent = "Failed to create item. Server returned " + this.status + " - " + this.responseText;
+            renderMessageDialog("error", "Failed to create item. Server returned " +
+                this.status + " - " + this.responseText);
         }
     };
 }
@@ -39,7 +40,8 @@ function getTodoList(callback) {
         if (this.status === 200) {
             callback(JSON.parse(this.responseText));
         } else {
-            error.textContent = "Failed to get list. Server returned " + this.status + " - " + this.responseText;
+            renderMessageDialog("error", "Failed to get list. Server returned " +
+                this.status + " - " + this.responseText);
         }
     };
     createRequest.send();
@@ -52,7 +54,8 @@ function getTodo(id, callback) {
         if (this.status === 200) {
             callback(JSON.parse(this.responseText));
         } else {
-            error.textContent = "Failed to get list. Server returned " + this.status + " - " + this.responseText;
+            renderMessageDialog("error", "Failed to get " +
+                id.toString() + ". Server returned " + this.status + " - " + this.responseText);
         }
     };
     createRequest.send();
@@ -105,6 +108,14 @@ function reloadTodoList() {
         });
     });
 }
+function renderMessageDialog(message, type) {
+    messagesDiv.disabled = false;
+    type = type === undefined ? "error" : type;
+    var div = document.createElement("div");
+    div.className = "dialog " + type;
+    div.textContent = message;
+    messagesDiv.insertBefore(div, messagesDiv.firstChild);
+}
 
 function findTodo(id) {
     for (var i in todosLocal) {
@@ -133,7 +144,8 @@ function updateTodo(element, todoId, callback) {
             }
             callback();
         } else {
-            error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
+            renderMessageDialog("error", "Failed to update item " +
+                todoId.toString() + ". Server returned " + this.status + " - " + this.responseText);
         }
     };
 }
@@ -143,10 +155,11 @@ function deleteTodo(todoId, callback) {
     deleteRequest.open("DELETE", "/api/todo/" + todoId);
     deleteRequest.onload = function() {
         if (this.status === 200) {
-            callback();
         } else {
-            error.textContent = "Failed to delete item. Server returned " + this.status + " - " + this.responseText;
+            renderMessageDialog("error", "Failed to delete item " +
+                todoId.toString() + ". Server returned " + this.status + " - " + this.responseText);
         }
+        callback(this.status);
     };
     deleteRequest.send();
 }
@@ -160,6 +173,16 @@ function filter(type) {
             li.style.display = type === "complete" ? "none" : "list-item";
         }
     }
+}
+
+function deleteCompleted() {
+    var promises = [];
+    todosLocal.forEach(function(todo) {
+        if (todo.isComplete) {
+            promises.push(new Promise(function(resolve, reject) {deleteTodo(todo.id, resolve);}));
+        }
+    });
+    Promise.all(promises).then(reloadTodoList);
 }
 
 reloadTodoList();
