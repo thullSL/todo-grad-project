@@ -9,7 +9,7 @@ var incompleteTodoCount = 0;
 var todosLocal = {};
 var currentFilter = "all";
 var lastUpdate = 0;
-var todoUpdateLock = false;
+
 form.onsubmit = function(event) {
     var title = todoTitle.value;
     createTodo(title, function() {
