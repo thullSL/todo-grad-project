@@ -34,6 +34,27 @@ describe("server", function() {
             });
         });
     });
+    describe("get list of actions", function() {
+        var todoChangesUrl =  baseUrl + "/api/changes";
+        it("responds with status code 200", function(done) {
+            request(todoChangesUrl, function(error, response) {
+                assert.equal(response.statusCode, 200);
+                done();
+            });
+        });
+        it("responds with a body encoded as JSON in UTF-8", function(done) {
+            request(todoChangesUrl, function(error, response) {
+                assert.equal(response.headers["content-type"], "application/json; charset=utf-8");
+                done();
+            });
+        });
+        it("responds with a body that is a JSON empty array", function(done) {
+            request(todoChangesUrl, function(error, response, body) {
+                assert.equal(body, "[]");
+                done();
+            });
+        });
+    });
     describe("get a single todo", function() {
         it("responds with status code 404", function(done) {
             request.get({
