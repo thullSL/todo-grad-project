@@ -78,7 +78,7 @@ function reloadTodoList() {
             deleteButton.id = "deleteTODO" + i;
             deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
             deleteButton.textContent = "X";
-            deleteButton.className  = "deleteButton";
+            deleteButton.className  = "deleteButton button";
 
             var completeBox = document.createElement("input");
             completeBox.type = "checkbox";

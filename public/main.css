@@ -27,3 +27,24 @@ h1 {
     text-decoration: line-through;
     color: gray;
 }
+
+.deleteButton{
+    margin-left: 10px;
+}
+.button{
+    
+    height: 20px;
+    border-radius: 8px;
+    box-shadow: 2px 0px 1px 0px #639DCD;
+    border-style: none;
+    outline:none;
+    vertical-align: middle;
+}
+.button:active{
+    box-shadow: none;
+}
+.isCompleteCheckbox{
+    width:20px;
+    height:20px;
+    vertical-align: middle;
+}
