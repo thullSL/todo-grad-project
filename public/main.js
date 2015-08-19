@@ -167,7 +167,7 @@ function filter(type) {
     currentFilter = type;
     for (var i = 0; i < todoList.childNodes.length; i++) {
         var li = todoList.childNodes[i];
-        if (li.className.indexOf("completed") > -1) {
+        if ( (" " + li.className + " ").indexOf(" completed ") > -1) {
             li.style.display = type === "active" ? "none" : "list-item";
         } else {
             li.style.display = type === "complete" ? "none" : "list-item";
