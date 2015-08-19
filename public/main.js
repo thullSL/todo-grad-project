@@ -16,48 +16,82 @@ form.onsubmit = function(event) {
 };
 
 function createTodo(title, callback) {
-    var createRequest = new XMLHttpRequest();
-    createRequest.open("POST", "/api/todo");
-    createRequest.setRequestHeader("Content-type", "application/json");
-    createRequest.send(JSON.stringify({
-        title: title
-    }));
-    createRequest.onload = function() {
-        if (this.status === 201) {
-            callback();
-        } else {
-            renderMessageDialog("error", "Failed to create item. Server returned " +
-                this.status + " - " + this.responseText);
-        }
-    };
+    fetch("/api/todo", {
+        method: "post",
+        headers: {"Content-type": "application/json"},
+        body: JSON.stringify({title: title}),
+    }).then(checkStatus).then(callback)
+    .catch(function(error) {
+        renderMessageDialog("error", "Failed to create item. Server returned " +
+                error.status + " - " + error.responseText);
+    });
 }
 
 function getTodoList(callback) {
-    var createRequest = new XMLHttpRequest();
-    createRequest.open("GET", "/api/todo");
-    createRequest.onload = function() {
-        if (this.status === 200) {
-            callback(JSON.parse(this.responseText));
-        } else {
+    fetch("/api/todo/", {method: "get"})
+        .then(checkStatus)
+        .then(parseJSON)
+        .then(callback)
+        .catch(function(error) {
             renderMessageDialog("error", "Failed to get list. Server returned " +
                 this.status + " - " + this.responseText);
-        }
-    };
-    createRequest.send();
+        });
 }
 
 function getTodo(id, callback) {
-    var createRequest = new XMLHttpRequest();
-    createRequest.open("GET", "/api/todo/" + id);
-    createRequest.onload = function() {
-        if (this.status === 200) {
-            callback(JSON.parse(this.responseText));
-        } else {
+    fetch("/api/todo/" + id.toString() , {method: "get"})
+        .then(checkStatus)
+        .then(parseJSON)
+        .then(callback)
+        .catch(function(error) {
             renderMessageDialog("error", "Failed to get " +
-                id.toString() + ". Server returned " + this.status + " - " + this.responseText);
+                    id.toString() + ". Server returned " + error.status + " - " + error.responseText);
+        });
+}
+
+function updateTodo(element, todoId, callback) {
+    var  todo = findTodo(todoId);
+    fetch("/api/todo/" + todo.id, {
+        method : "put",
+        headers : {"Content-type" : "application/json"},
+        body : JSON.stringify({
+            title: todo.title,
+            isComplete: element.checked
+        })
+    })
+    .then(checkStatus)
+    .then(function(data) {
+        if (element.checked) {
+            element.parentNode.className += "completed";
+        } else {
+            element.parentNode.className = element.parentNode.className.replace("completed", "");
         }
-    };
-    createRequest.send();
+    })
+    .then(callback)
+    .catch(function(error) {
+            renderMessageDialog("error", "Failed to update item " +
+                todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+        });
+}
+
+function deleteTodo(todoId, callback) {
+    fetch("/api/todo/" + todoId , {method: "delete"})
+        .then(checkStatus)
+        .then(callback)
+        .catch(function(error) {
+            renderMessageDialog("error", "Failed to delete item " +
+                todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+        });
+}
+
+function deleteCompleted() {
+    var promises = [];
+    todosLocal.forEach(function(todo) {
+        if (todo.isComplete) {
+            promises.push(new Promise(function(resolve, reject) {deleteTodo(todo.id, resolve);}));
+        }
+    });
+    Promise.all(promises).then(reloadTodoList);
 }
 
 function reloadTodoList() {
@@ -117,53 +151,18 @@ function findTodo(id) {
     }
 }
 
-function updateTodo(element, todoId, callback) {
-    var updateRequest = new XMLHttpRequest();
-    var  todo = findTodo(todoId);
-    updateRequest.open("PUT", "/api/todo/" + todo.id);
-    updateRequest.setRequestHeader("Content-type", "application/json");
-    var d = element.checked;
-    updateRequest.send(JSON.stringify({
-        title: todo.title,
-        isComplete: element.checked
-    }));
-    updateRequest.onload = function() {
-        if (this.status === 200) {
-            if (element.checked) {
-                element.parentNode.className += "completed";
-            } else {
-                element.parentNode.className = element.parentNode.className.replace("completed", "");
-            }
-            callback();
-        } else {
-            renderMessageDialog("error", "Failed to update item " +
-                todoId.toString() + ". Server returned " + this.status + " - " + this.responseText);
-        }
-    };
+function checkStatus(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return response;
+    } else {
+        var error = new Error(response.statusText);
+        error.response = response;
+        throw error;
+    }
 }
 
-function deleteTodo(todoId, callback) {
-    var deleteRequest = new XMLHttpRequest();
-    deleteRequest.open("DELETE", "/api/todo/" + todoId);
-    deleteRequest.onload = function() {
-        if (this.status === 200) {
-        } else {
-            renderMessageDialog("error", "Failed to delete item " +
-                todoId.toString() + ". Server returned " + this.status + " - " + this.responseText);
-        }
-        callback(this.status);
-    };
-    deleteRequest.send();
-}
-
-function deleteCompleted() {
-    var promises = [];
-    todosLocal.forEach(function(todo) {
-        if (todo.isComplete) {
-            promises.push(new Promise(function(resolve, reject) {deleteTodo(todo.id, resolve);}));
-        }
-    });
-    Promise.all(promises).then(reloadTodoList);
+function parseJSON(response) {
+    return response.json();
 }
 
 reloadTodoList();
