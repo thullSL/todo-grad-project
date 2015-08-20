@@ -14,14 +14,13 @@ module.exports = function(port, middleware, callback) {
 
     var latestId = 0;
     var todos = [];
-    function Action(action, data){
+    function Action(action, data) {
         this.id = commandNum++;
         this.action = action;
-        this.data = data
-        this.logAction = function(){
+        this.data = data;
+        this.logAction = function() {
             actionHistory.push(this);
-        }
-
+        };
     }
 
     // Create
@@ -89,8 +88,7 @@ module.exports = function(port, middleware, callback) {
     // Get changes
     app.get("/api/changes", function(req, res) {
         var lastCommand = req.query.lastCommand !== undefined ? req.query.lastCommand : 0;
-        
-        changes = actionHistory.filter(function(action) {return action.id >= lastCommand; });
+        var changes = actionHistory.filter(function(action) {return action.id >= lastCommand;});
         res.json(changes);
     });
 

@@ -1,5 +1,8 @@
 /*global Promise*/
- /*jshint -W083 */
+ /*jshint -W083*/
+ /*jshint esnext: true*/
+ /*jshint moz: true*/
+
 var todoList = document.getElementById("todo-list");
 var todoListPlaceholder = document.getElementById("todo-list-placeholder");
 var form = document.getElementById("todo-form");
@@ -13,14 +16,13 @@ var lastCommand = 0;
 form.onsubmit = function(event) {
     var title = todoTitle.value;
     createTodo(title, function() {
-        reloadTodoList();
     });
     todoTitle.value = "";
     event.preventDefault();
 };
 
 function createTodo(title, callback) {
-    var id
+    var id;
     fetch("/api/todo", {
         method: "post",
         headers: {"Content-type": "application/json"},
@@ -32,7 +34,6 @@ function createTodo(title, callback) {
         renderList(todosLocal);
     }).then(callback)
     .catch(function(error) {
-        todosLocal.clear(id);
         renderMessageDialog("error", "Failed to create item. Server returned " +
                 error.status + " - " + error.responseText);
     });
@@ -108,6 +109,7 @@ function updateTodo(element, todoId, callback) {
     })
     .then(checkStatus)
     .then(function(data) {
+        todo.isComplete = element.checked;
         if (element.checked) {
             element.parentNode.className += "completed";
         } else {
@@ -124,6 +126,10 @@ function updateTodo(element, todoId, callback) {
 function deleteTodo(todoId, callback) {
     fetch("/api/todo/" + todoId , {method: "delete"})
         .then(checkStatus)
+        .then(function(response) {
+            todosLocal.delete(todoId.toString());
+            renderList(todosLocal);
+        })
         .then(callback)
         .catch(function(error) {
             renderMessageDialog("error", "Failed to delete item " +
@@ -178,7 +184,7 @@ function renderTodo(ul, todo, i) {
 
     var deleteButton = document.createElement("button");
     deleteButton.id = "deleteTODO" + i;
-    deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ", reloadTodoList)");
+    deleteButton.setAttribute("onClick", "deleteTodo(" + todo.id + ")");
     deleteButton.textContent = "X";
     deleteButton.className  = "deleteButton";
 
@@ -191,7 +197,7 @@ function renderTodo(ul, todo, i) {
         incompleteTodoCount++;
     }
     completeBox.className = "isCompleteCheckbox";
-    completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ", reloadTodoList)");
+    completeBox.setAttribute("onClick", "updateTodo(this, " + todo.id + ")");
 
     listItem.appendChild(deleteButton);
     listItem.appendChild(completeBox);
@@ -232,4 +238,4 @@ function parseJSON(response) {
 }
 
 reloadTodoList();
-//var timedReload = window.setInterval(reloadTodoList, 1000);
+var timedReload = window.setInterval(reloadTodoList, 1000);

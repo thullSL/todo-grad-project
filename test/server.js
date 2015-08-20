@@ -48,12 +48,6 @@ describe("server", function() {
                 done();
             });
         });
-        it("responds with a body that is a JSON empty array", function(done) {
-            request(todoChangesUrl, function(error, response, body) {
-                assert.equal(body, "[]");
-                done();
-            });
-        });
     });
     describe("get a single todo", function() {
         it("responds with status code 404", function(done) {
