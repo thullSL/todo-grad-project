@@ -6,9 +6,9 @@ var form = document.getElementById("todo-form");
 var todoTitle = document.getElementById("new-todo");
 var messagesDiv = document.getElementById("messages");
 var incompleteTodoCount = 0;
-var todosLocal = {};
+var todosLocal = new Map();
 var currentFilter = "all";
-var lastUpdate = 0;
+var lastCommand = 0;
 
 form.onsubmit = function(event) {
     var title = todoTitle.value;
@@ -20,48 +20,51 @@ form.onsubmit = function(event) {
 };
 
 function createTodo(title, callback) {
+    var id
     fetch("/api/todo", {
         method: "post",
         headers: {"Content-type": "application/json"},
         body: JSON.stringify({title: title}),
-    }).then(checkStatus).then(callback)
+    }).then(checkStatus).then(function(response) {
+        var loc = response.headers.get("location");
+        id = loc.substring(loc.lastIndexOf("/") + 1);
+        todosLocal.set(id, {id : id, title : title, isComplete : false});
+        renderList(todosLocal);
+    }).then(callback)
     .catch(function(error) {
+        todosLocal.clear(id);
         renderMessageDialog("error", "Failed to create item. Server returned " +
                 error.status + " - " + error.responseText);
     });
 }
 function performActions(actions) {
+    var todos = todosLocal;
     actions.forEach(function(actionOb) {
         switch (actionOb.action) {
-            case "create" : todosLocal[actionOb.data.id] = actionOb.data;
+            case "create" : todos.set(actionOb.data.id, actionOb.data);
                 break;
-            case "update" : todosLocal[actionOb.data.id] = actionOb.data;
+            case "update" : todos.set(actionOb.data.id, actionOb.data);
                 break;
-            case "delete" : delete todosLocal[actionOb.data];
+            case "delete" : todos.delete(actionOb.data);
         }
+        lastCommand = actionOb.id > lastCommand? actionOb.id : lastCommand;
     });
     return todosLocal;
 }
 
-function logUpdateTime() {
-    lastUpdate = Date.now();
-}
-
 function mappify(arr) {
-    var map = {};
     arr.forEach(function(todo) {
-        map[todo.id] = todo;
+        todosLocal.set(todo.id, todo);
     });
-    return map;
+    return todosLocal;
 }
 function getTodoList(callback) {
-    if (lastUpdate > 0) {
-        fetch("/api/changes?since=" + lastUpdate, {method: "get"})
+    if (lastCommand > 0) {
+        fetch("/api/changes?lastCommand=" + lastCommand, {method: "get"})
         .then(checkStatus)
         .then(parseJSON)
         .then(performActions)
         .then(callback)
-        .then(logUpdateTime)
         .catch(function(error) {
             renderMessageDialog("error", "Failed to get updates. Server returned " +
                 this.status + " - " + this.responseText);
@@ -72,11 +75,11 @@ function getTodoList(callback) {
         .then(parseJSON)
         .then(mappify)
         .then(callback)
-        .then(logUpdateTime)
         .catch(function(error) {
             renderMessageDialog("error", "Failed to get list. Server returned " +
                 this.status + " - " + this.responseText);
         });
+        lastCommand ++;
     }
 }
 
@@ -93,7 +96,8 @@ function getTodo(id, callback) {
 }
 
 function updateTodo(element, todoId, callback) {
-    var  todo = todosLocal[todoId];
+    var tds = todosLocal;
+    var  todo = todosLocal.get(todoId.toString());
     fetch("/api/todo/" + todo.id, {
         method : "put",
         headers : {"Content-type" : "application/json"},
@@ -129,9 +133,8 @@ function deleteTodo(todoId, callback) {
 
 function deleteCompleted() {
     var promises = [];
-    for (var key in todosLocal) {
-        var todo = todosLocal[key];
-        if (todosLocal[key].isComplete) {
+    for (var todo of todosLocal.values()) {
+        if (todo.isComplete) {
             promises.push(new Promise(function(resolve, reject) {deleteTodo(todo.id, resolve);}));
         }
     }
@@ -139,29 +142,33 @@ function deleteCompleted() {
 }
 
 function reloadTodoList() {
+    getTodoList(renderList);
+}
+
+function renderList(todos){
     var todoListBuff = document.createElement("ul");
     todoListBuff.id  = "todo-list";
     var parent = todoList.parentNode;
-    getTodoList(function(todos) {
-        todosLocal = todos;
-        todoListPlaceholder.style.display = "none";
-        incompleteTodoCount = 0;
-        var i = 0;
-        var promises = [];
-        for (var key in todosLocal) {
-            promises.push(new Promise(function(resolve, reject) {
-                renderTodo(todoListBuff, todosLocal[key], i);
-                i++;
-                resolve();
-            }));
-        }
-        Promise.all(promises).then(function() {
-            document.getElementById("count-label").textContent = "Total ToDos left to do: " +
-                                                                incompleteTodoCount.toString();
-            parent.replaceChild(todoListBuff, todoList);
-            todoList = todoListBuff;
-            filter(currentFilter);
-        });
+    todos = todos === undefined? todosLocal : todos;
+
+    todosLocal = todos;
+    todoListPlaceholder.style.display = "none";
+    incompleteTodoCount = 0;
+    var i = 0;
+    var promises = [];
+    for (var todo of todosLocal.values()) {
+        promises.push(new Promise(function(resolve, reject) {
+            renderTodo(todoListBuff, todo, i);
+            i++;
+            resolve();
+        }));
+    }
+    Promise.all(promises).then(function() {
+        document.getElementById("count-label").textContent = "Total ToDos left to do: " +
+                                                            incompleteTodoCount.toString();
+        parent.replaceChild(todoListBuff, todoList);
+        todoList = todoListBuff;
+        filter(currentFilter);
     });
 }
 
@@ -225,4 +232,4 @@ function parseJSON(response) {
 }
 
 reloadTodoList();
-var timedReload = window.setInterval(reloadTodoList, 1000);
+//var timedReload = window.setInterval(reloadTodoList, 1000);

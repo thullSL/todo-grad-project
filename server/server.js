@@ -60,7 +60,7 @@ module.exports = function(port, middleware, callback) {
             todos = todos.filter(function(otherTodo) {
                 return otherTodo !== todo;
             });
-            new Action("Delete", id).logAction();
+            new Action("delete", id).logAction();
             res.sendStatus(200);
         } else {
             res.sendStatus(404);
@@ -72,11 +72,10 @@ module.exports = function(port, middleware, callback) {
         var id  = req.params.id;
         var todo = getTodo(id);
         if (todo) {
-            // console.log()
             if (req.body.title !== undefined &&  req.body.isComplete !== undefined) {
                 todo.title = req.body.title;
                 todo.isComplete = req.body.isComplete;
-                new Action("Update", todo).logAction();
+                new Action("update", todo).logAction();
                 res.sendStatus(200);
             } else {
                 res.set("responseText", "Invalid or incomplete TODO object");
@@ -91,7 +90,7 @@ module.exports = function(port, middleware, callback) {
     app.get("/api/changes", function(req, res) {
         var lastCommand = req.query.lastCommand !== undefined ? req.query.lastCommand : 0;
         
-        changes = actionHistory.filter(function(action) {return action.id > lastCommand; });
+        changes = actionHistory.filter(function(action) {return action.id >= lastCommand; });
         res.json(changes);
     });
 
@@ -110,7 +109,7 @@ module.exports = function(port, middleware, callback) {
     });
 
     return {
-        close: function(callback) {
+        close: function(callback) {//assada
             connections.forEach(function(connection) {
                 connection.destroy();
             });
