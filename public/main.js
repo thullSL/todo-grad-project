@@ -11,44 +11,43 @@ var messagesDiv = document.getElementById("messages");
 var incompleteTodoCount = 0;
 var todosLocal = new Map();
 var currentFilter = "all";
-var lastCommand = 0;
+var lastActionID = 0;
 
 form.onsubmit = function(event) {
     var title = todoTitle.value;
-    createTodo(title, function() {
-    });
+    createTodo(title);
     todoTitle.value = "";
     event.preventDefault();
 };
 
-function createTodo(title, callback) {
-    var id;
+function createTodo(title) {
     fetch("/api/todo", {
         method: "post",
         headers: {"Content-type": "application/json"},
         body: JSON.stringify({title: title}),
-    }).then(checkStatus).then(function(response) {
+    })
+    .then(checkStatus)
+    .then(function(response) {
         var loc = response.headers.get("location");
-        id = loc.substring(loc.lastIndexOf("/") + 1);
+        var id = loc.substring(loc.lastIndexOf("/") + 1);
         todosLocal.set(id, {id : id, title : title, isComplete : false});
-        renderList(todosLocal);
-    }).then(callback)
+    })
+    .then(renderList)
     .catch(function(error) {
         renderMessageDialog("error", "Failed to create item. Server returned " +
                 error.status + " - " + error.responseText);
     });
 }
 function performActions(actions) {
-    var todos = todosLocal;
     actions.forEach(function(actionOb) {
         switch (actionOb.action) {
-            case "create" : todos.set(actionOb.data.id, actionOb.data);
+            case "create" : todosLocal.set(actionOb.data.id, actionOb.data);
                 break;
-            case "update" : todos.set(actionOb.data.id, actionOb.data);
+            case "update" : todosLocal.set(actionOb.data.id, actionOb.data);
                 break;
-            case "delete" : todos.delete(actionOb.data);
+            case "delete" : todosLocal.delete(actionOb.data.id);
         }
-        lastCommand = actionOb.id > lastCommand? actionOb.id : lastCommand;
+        lastActionID = actionOb.id > lastActionID ? actionOb.id : lastActionID;
     });
     return todosLocal;
 }
@@ -60,8 +59,8 @@ function mappify(arr) {
     return todosLocal;
 }
 function getTodoList(callback) {
-    if (lastCommand > 0) {
-        fetch("/api/changes?lastCommand=" + lastCommand, {method: "get"})
+    if (lastActionID > 0) {
+        fetch("/api/changes?lastActionID=" + lastActionID, {method: "get"})
         .then(checkStatus)
         .then(parseJSON)
         .then(performActions)
@@ -80,7 +79,7 @@ function getTodoList(callback) {
             renderMessageDialog("error", "Failed to get list. Server returned " +
                 this.status + " - " + this.responseText);
         });
-        lastCommand ++;
+        lastActionID++;
     }
 }
 
@@ -96,7 +95,7 @@ function getTodo(id, callback) {
         });
 }
 
-function updateTodo(element, todoId, callback) {
+function updateTodo(element, todoId) {
     var tds = todosLocal;
     var  todo = todosLocal.get(todoId.toString());
     fetch("/api/todo/" + todo.id, {
@@ -116,7 +115,6 @@ function updateTodo(element, todoId, callback) {
             element.parentNode.className = element.parentNode.className.replace("completed", "");
         }
     })
-    .then(callback)
     .catch(function(error) {
             renderMessageDialog("error", "Failed to update item " +
                 todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
@@ -134,6 +132,7 @@ function deleteTodo(todoId, callback) {
         .catch(function(error) {
             renderMessageDialog("error", "Failed to delete item " +
                 todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+            callback();
         });
 }
 

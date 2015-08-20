@@ -1,9 +1,10 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var _ = require("underscore");
-var actionHistory = [];
-var commandNum = 0;
+
 module.exports = function(port, middleware, callback) {
+    var actionHistory = [];
+    var commandNum = 0;
     var app = express();
 
     if (middleware) {
@@ -59,7 +60,7 @@ module.exports = function(port, middleware, callback) {
             todos = todos.filter(function(otherTodo) {
                 return otherTodo !== todo;
             });
-            new Action("delete", id).logAction();
+            new Action("delete", {id: id}).logAction();
             res.sendStatus(200);
         } else {
             res.sendStatus(404);
@@ -87,8 +88,8 @@ module.exports = function(port, middleware, callback) {
 
     // Get changes
     app.get("/api/changes", function(req, res) {
-        var lastCommand = req.query.lastCommand !== undefined ? req.query.lastCommand : 0;
-        var changes = actionHistory.filter(function(action) {return action.id >= lastCommand;});
+        var lastActionID = req.query.lastActionID !== undefined ? req.query.lastActionID : 0;
+        var changes = actionHistory.filter(function(action) {return action.id >= lastActionID;});
         res.json(changes);
     });
 

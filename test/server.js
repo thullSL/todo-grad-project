@@ -48,6 +48,25 @@ describe("server", function() {
                 done();
             });
         });
+        it("responds with a body that is a JSON empty array", function(done) {
+            request(todoChangesUrl, function(error, response, body) {
+                assert.equal(body, "[]");
+                done();
+            });
+        });
+        it("responds with status code 200 with TODO item", function(done) {
+            request.post({
+                url: todoListUrl,
+                json: {
+                    title: "This is a TODO item"
+                }
+            }, function() {
+                request.get(todoChangesUrl + "?lastActionID=0", function(error, response, body) {
+                    assert(body.length > 5);
+                    done();
+                });
+            });
+        });
     });
     describe("get a single todo", function() {
         it("responds with status code 404", function(done) {
