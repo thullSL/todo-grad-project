@@ -4,6 +4,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-mocha-test");
     grunt.loadNpmTasks("grunt-mocha-istanbul");
     grunt.loadNpmTasks("grunt-serve");
+    grunt.loadNpmTasks("grunt-nodemon");
 
     var testOutputLocation = process.env.CIRCLE_TEST_REPORTS || "test_output";
     var artifactsLocation = "build_artifacts";
@@ -71,6 +72,14 @@ module.exports = function(grunt) {
         serve: {
             port: 8080,
             task: ["./server/server.js"]
+        },
+        nodemon: {
+            all: {
+                script: "server.js",
+                options : {
+                    ignore : ["public/"]
+                }
+            }
         }
     });
 
@@ -97,7 +106,7 @@ module.exports = function(grunt) {
         "istanbul_check_coverage"]);
     grunt.registerTask("ci-test", ["check", "mochaTest:ci", "mocha_istanbul:ci", "istanbul_report",
         "istanbul_check_coverage"]);
-    grunt.registerTask("default", "test");
+    grunt.registerTask("default", "nodemon");
 
     grunt.registerTask("serve", "Start a custom web server.", function() {
         var done = this.async();
