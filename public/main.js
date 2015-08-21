@@ -13,8 +13,9 @@ var todoMain = function (){
     var todosLocal = new Map();
     var currentFilter = "all";
     var lastActionID = 0;
+    var self = this;
 
-    filter = function(type) {
+    this.filter = function(type) {
         currentFilter = type;
         for (var i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
@@ -24,9 +25,9 @@ var todoMain = function (){
                 li.style.display = type === "complete" ? "none" : "list-item";
             }
         }
-    }
+    };
 
-    deleteCompleted = function() {
+    this.deleteCompleted = function() {
         var promises = [];
         for (var todo of todosLocal.values()) {
             if (todo.isComplete) {
@@ -34,7 +35,7 @@ var todoMain = function (){
             }
         }
         Promise.all(promises).then(reloadTodoList);
-    }
+    };
 
     form.onsubmit = function(event) {
         var title = todoTitle.value;
@@ -50,16 +51,18 @@ var todoMain = function (){
             body: JSON.stringify({title: title}),
         })
         .then(checkStatus)
-        .then(function(response) {
-            var loc = response.headers.get("location");
-            var id = loc.substring(loc.lastIndexOf("/") + 1);
-            todosLocal.set(id, {id : id, title : title, isComplete : false});
-        })
+        .then(optimisticCreateTodo)
         .then(renderList)
         .catch(function(error) {
             renderMessageDialog("error", "Failed to create item. Server returned " +
                     error.status + " - " + error.responseText);
         });
+
+        function optimisticCreateTodo(response){
+            var loc = response.headers.get("location");
+            var id = loc.substring(loc.lastIndexOf("/") + 1);
+            todosLocal.set(id, {id : id, title : title, isComplete : false});
+        }
     }
     function performActions(actions) {
         actions.forEach(function(actionOb) {
@@ -127,35 +130,39 @@ var todoMain = function (){
             })
         })
         .then(checkStatus)
-        .then(function(data) {
+        .then(optimisticUpdatTodo)
+        .catch(function(error) {
+                renderMessageDialog("error", "Failed to update item " +
+                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+        });
+
+        function optimisticUpdatTodo(data){
             todo.isComplete = element.checked;
             if (element.checked) {
                 element.parentNode.className += "completed";
             } else {
                 element.parentNode.className = element.parentNode.className.replace("completed", "");
             }
-        })
-        .catch(function(error) {
-                renderMessageDialog("error", "Failed to update item " +
-                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-            });
+        }
     }
+
+    
 
     function deleteTodo(todoId, callback) {
         fetch("/api/todo/" + todoId , {method: "delete"})
-            .then(checkStatus)
-            .then(function(response) {
-                todosLocal.delete(todoId.toString());
-                renderList(todosLocal);
-            })
-            .then(callback)
-            .catch(function(error) {
-                renderMessageDialog("error", "Failed to delete item " +
-                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-                callback();
-            });
+        .then(checkStatus)
+        .then(optimisticDeleteTodo)
+        .then(callback)
+        .catch(function(error) {
+            renderMessageDialog("error", "Failed to delete item " +
+                todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+            callback();
+        });
+         function optimisticDeleteTodo(response){
+             todosLocal.delete(todoId.toString());
+            renderList(todosLocal);
+        }
     }
-
    
     function reloadTodoList() {
         getTodoList(renderList);
@@ -182,7 +189,7 @@ var todoMain = function (){
                                                                 incompleteTodoCount.toString();
             parent.replaceChild(todoListBuff, todoList);
             todoList = todoListBuff;
-            filter(currentFilter);
+            self.filter(currentFilter);
         });
     }
 
@@ -194,7 +201,7 @@ var todoMain = function (){
         deleteButton.id = "deleteTODO" + i;
         deleteButton.onclick = function(){
             deleteTodo(todo.id);   
-        }
+        };
         deleteButton.textContent = "X";
         deleteButton.className  = "deleteButton";
 
@@ -209,12 +216,13 @@ var todoMain = function (){
         completeBox.className = "isCompleteCheckbox";
         completeBox.onclick = function(){
             updateTodo(completeBox, todo.id);
-        }
+        };
 
         listItem.appendChild(deleteButton);
         listItem.appendChild(completeBox);
         ul.appendChild(listItem);
     }
+
     function renderMessageDialog(type, message) {
         messagesDiv.disabled = false;
         type = type === undefined ? "error" : type;
