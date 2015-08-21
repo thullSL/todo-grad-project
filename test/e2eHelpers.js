@@ -55,7 +55,7 @@ module.exports.navigateToSite = function() {
 };
 
 module.exports.getTitleText = function() {
-    return driver.findElement(webdriver.By.css("h1")).getText();
+    return driver.findElement(webdriver.By.id("header")).getText();
 };
 
 module.exports.getInputText = function() {

@@ -171,7 +171,7 @@ var todoMain = function (){
 
     function renderList(){
         var todoListBuff = document.createElement("ul");
-        todoListBuff.className = "list-group todo-list-group"
+        todoListBuff.className = "list-group todo-list-group";
         todoListBuff.id  = "todo-list";
         var parent = todoList.parentNode;
 
@@ -196,14 +196,14 @@ var todoMain = function (){
     }
 
     function renderTodo(ul, todo, i) {
-        var x = String.fromCharCode(160)
+        var x = String.fromCharCode(160);
         var listItem = document.createElement("li");
-        listItem.className = "list-group-item background-coloured"
+        listItem.className = "list-group-item background-coloured";
         listItem.setAttribute("for", "text" + todo.id);
 
         var row1 = createRow();
         row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------";
-        row1.className = "topRowDecoraction"
+        row1.className = "topRowDecoraction";
 
         var deleteButton = document.createElement("button");
         deleteButton.id = "deleteTODO" + i;
@@ -216,9 +216,9 @@ var todoMain = function (){
         deleteSpan.className = "glyphicon glyphicon-remove wee-x-there";
         deleteButton.appendChild(deleteSpan);
 
-        row1.appendChild(deleteButton)
+        row1.appendChild(deleteButton);
 
-        listItem.appendChild(row1)                      
+        listItem.appendChild(row1);
 
         /*second row of todo*/
         var row2 = createRow();
