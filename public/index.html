@@ -3,33 +3,75 @@
     <head>
         <meta charset="utf-8">
         <title>TODO List</title>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/bootstrap.js"></script>
         <link href="main.css" rel="stylesheet" type="text/css">
         <link rel="icon" type="image/ico" href="favicon.ico">
     </head>
     <body>
-        <header>
-            <h1>TODO List</h1>
-        </header>
-        <div id="count-label"></div>
-        <section>
-            <h2 id="todo-list-placeholder">Loading...</h2>
-            <ul id="todo-list"></ul>
-            <form id="todo-form">
-                <input id="new-todo" placeholder="What needs to be done?" autofocus>
-                <input class="button" id="submit-todo" type="submit" value="Create">
-            </form>
-            <div class="buttonsDiv">
-                <br />
-                <button class="button" onclick="deleteCompleted()">Delete Completed</button>
+        <div id="wrapper">
+            <div id="sidebar-wrapper">
+                 <header>
+                    <h1>TODO List</h1>
+                </header>
+                <div class="filtration btn-group-vertical" role="group" aria-label="Filter">
+                    <button type="radio" class="btn btn-default" autofocus="true" name="filter" value="all" onClick="filter(this.value)" checked/>All<br />
+                    <button type="radio" class="btn btn-default" name="filter" value="active" onClick="filter(this.value)" />Active<br />
+                    <button type="radio" class="btn btn-default" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
+                </div>
+                <form id="todo-form">
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <input id="new-todo" class="form-control" placeholder="What needs to be done?" autofocus>
+                        </div>
+                        <input class="btn btn-default" id="submit-todo" type="submit" value="Create">
+                    </div>
+                </form>
+                <div class="buttonsDiv">
+                    <br />
+                    <button class="btn btn-default" onclick="deleteCompleted()">Delete Completed</button>
+                </div>
+                <div id="count-label"></div>
             </div>
-            <div id="messages" disabled="true"></div>
-        </section>
-        <div class="filtration">
-            <legend>Filter By</legend>
-            <input type="radio" name="filter" value="all" onClick="filter(this.value)" checked/>All<br />
-            <input type="radio" name="filter" value="active" onClick="filter(this.value)" />Active<br />
-            <input type="radio" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
+            <div id="page-content-wrapper">
+                <div class="page-content">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <section>
+                                    <h2 id="todo-list-placeholder">Loading...</h2>
+                                    <ul  class="list-group" id="todo-list"></ul>
+                                </section>
+                               <!--  <ul  class="list-group">
+                                     <li class="list-group-item background-coloured">
+                                         <div class="row">
+                                           ---------------------------------------------------------------------- 
+                                           <input type="button" class=" btn btn-success btn-small" />
+                                         </div>
+                                         <div class="row">
+                                            <div class="col-md-1">
+                                                <input type="checkbox" id="c1" />
+                                                <label for="c1"><span></span></label>
+                                            </div>
+                                            <div class="col-md-10">
+                                                this all the text
+                                            </div>
+                                            <div class="col-md-1">
+                                                
+                                            </div>
+                                         </div>
+
+                                     </li>
+                                 </ul> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+<div id="messages" disabled="true"></div>
         <script type="text/javascript" src="main.js"></script>
     </body>
 </html>

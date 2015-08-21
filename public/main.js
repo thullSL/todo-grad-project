@@ -15,14 +15,15 @@ var todoMain = function (){
     var lastActionID = 0;
     var self = this;
 
+
     this.filter = function(type) {
         currentFilter = type;
         for (var i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
             if ((" " + li.className + " ").indexOf(" completed ") > -1) {
-                li.style.display = type === "active" ? "none" : "list-item";
+                li.style.display = type === "active" ? "none" : "block";
             } else {
-                li.style.display = type === "complete" ? "none" : "list-item";
+                li.style.display = type === "complete" ? "none" : "block";
             }
         }
     };
@@ -138,15 +139,14 @@ var todoMain = function (){
 
         function optimisticUpdatTodo(data){
             todo.isComplete = element.checked;
+            var textElm = document.getElementById(element.getAttribute("for"));
             if (element.checked) {
-                element.parentNode.className += "completed";
+                textElm.className += " completed ";
             } else {
-                element.parentNode.className = element.parentNode.className.replace("completed", "");
+                textElm.className = textElm.className.replace(" completed ", "");
             }
         }
     }
-
-    
 
     function deleteTodo(todoId, callback) {
         fetch("/api/todo/" + todoId , {method: "delete"})
@@ -170,6 +170,7 @@ var todoMain = function (){
 
     function renderList(){
         var todoListBuff = document.createElement("ul");
+        todoListBuff.className = "list-group"
         todoListBuff.id  = "todo-list";
         var parent = todoList.parentNode;
 
@@ -194,33 +195,81 @@ var todoMain = function (){
     }
 
     function renderTodo(ul, todo, i) {
+        var x = String.fromCharCode(160)
         var listItem = document.createElement("li");
-        listItem.textContent = todo.title;
+        listItem.className = "list-group-item background-coloured"
+
+        var row1 = createRow();
+        row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------";
+        row1.className = "topRowDecoraction"
 
         var deleteButton = document.createElement("button");
         deleteButton.id = "deleteTODO" + i;
         deleteButton.onclick = function(){
             deleteTodo(todo.id);   
         };
-        deleteButton.textContent = "X";
-        deleteButton.className  = "deleteButton";
+        deleteButton.className  = "deleteButton btn btn-danger btn-small-sqaure";
+        // deleteButton.textContent = "X"
+        var deleteSpan = document.createElement("span");
+        deleteSpan.className = "glyphicon glyphicon-remove wee-x-there";
+        deleteButton.appendChild(deleteSpan);
+
+        row1.appendChild(deleteButton)
+
+        listItem.appendChild(row1)                      
+
+        /*second row of todo*/
+        var row2 = createRow();
+
+        /*second row checkbox*/
+        var checkDiv = document.createElement("div");
+        checkDiv.className = "col-md-1";
 
         var completeBox = document.createElement("input");
         completeBox.type = "checkbox";
         completeBox.checked = todo.isComplete;
-        if (todo.isComplete) {
-            listItem.className += "completed";
-        }else {
-            incompleteTodoCount++;
-        }
-        completeBox.className = "isCompleteCheckbox";
-        completeBox.onclick = function(){
+        completeBox.id = "cb" + todo.id;
+        completeBox.setAttribute("for", "text" + todo.id);
+
+        completeBox.className = "isCompleteCheckbox btn btn-success left";
+        completeBox.onclick = function() {
             updateTodo(completeBox, todo.id);
         };
 
-        listItem.appendChild(deleteButton);
-        listItem.appendChild(completeBox);
+        checkDiv.appendChild(completeBox);
+
+        var label = document.createElement("label");
+        label.setAttribute("for", "cb" + todo.id);
+
+        checkDiv.appendChild(label);
+
+        row2.appendChild(checkDiv);
+
+        /*second row text*/
+        var textDiv =document.createElement("div");
+        textDiv.className = "col-md-10";
+        if (todo.isComplete) {
+            textDiv.className += " completed ";
+        }else {
+            incompleteTodoCount++;
+        }
+        textDiv.textContent = todo.title;
+        textDiv.id = "text" + todo.id;
+
+        row2.appendChild(textDiv);
+
+
+        // row2.appendChild(deleteDiv);
+
+        listItem.appendChild(row2);
+
         ul.appendChild(listItem);
+    }
+
+    function createRow(){
+        var row = document.createElement("div");
+        row.className = "row";
+        return row;
     }
 
     function renderMessageDialog(type, message) {
@@ -247,6 +296,6 @@ var todoMain = function (){
     }
 
     reloadTodoList();
-    var timedReload = window.setInterval(reloadTodoList, 1000);
+    //var timedReload = window.setInterval(reloadTodoList, 1000);
 };
 todoMain();
