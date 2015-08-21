@@ -12,11 +12,15 @@ module.exports = function(grunt) {
         jshint: {
             all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js"],
             options: {
-                jshintrc: true
+                jshintrc: true,
+                esnext : true
             }
         },
         jscs: {
-            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js"]
+            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js"],
+            options: {
+                esnext : true
+            }  
         },
         mochaTest: {
             test: {

@@ -1,8 +1,10 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var _ = require("underscore");
-var actionHistory = {};
+
 module.exports = function(port, middleware, callback) {
+    var actionHistory = [];
+    var commandNum = 0;
     var app = express();
 
     if (middleware) {
@@ -13,6 +15,14 @@ module.exports = function(port, middleware, callback) {
 
     var latestId = 0;
     var todos = [];
+    function Action(action, data) {
+        this.id = commandNum++;
+        this.action = action;
+        this.data = data;
+        this.logAction = function() {
+            actionHistory.push(this);
+        };
+    }
 
     // Create
     app.post("/api/todo", function(req, res) {
@@ -21,7 +31,7 @@ module.exports = function(port, middleware, callback) {
         todo.isComplete = false;
         latestId++;
         todos.push(todo);
-        actionHistory[Date.now()] = {"action" : "create", "data" : todo};
+        new Action("create", todo).logAction();
         res.set("Location", "/api/todo/" + todo.id);
         res.sendStatus(201);
     });
@@ -50,7 +60,7 @@ module.exports = function(port, middleware, callback) {
             todos = todos.filter(function(otherTodo) {
                 return otherTodo !== todo;
             });
-            actionHistory[Date.now()] = {"action" : "delete", "data" : id};
+            new Action("delete", {id: id}).logAction();
             res.sendStatus(200);
         } else {
             res.sendStatus(404);
@@ -62,11 +72,10 @@ module.exports = function(port, middleware, callback) {
         var id  = req.params.id;
         var todo = getTodo(id);
         if (todo) {
-            // console.log()
             if (req.body.title !== undefined &&  req.body.isComplete !== undefined) {
                 todo.title = req.body.title;
                 todo.isComplete = req.body.isComplete;
-                actionHistory[Date.now()] = {"action" : "update", "data" : todo};
+                new Action("update", todo).logAction();
                 res.sendStatus(200);
             } else {
                 res.set("responseText", "Invalid or incomplete TODO object");
@@ -79,13 +88,8 @@ module.exports = function(port, middleware, callback) {
 
     // Get changes
     app.get("/api/changes", function(req, res) {
-        var since = req.query.since !== undefined ? req.query.since : 0;
-        var changes = [];
-        for (var time in actionHistory) {
-            if (time > req.query.since) {
-                changes.push(actionHistory[time]);
-            }
-        }
+        var lastActionID = req.query.lastActionID !== undefined ? req.query.lastActionID : 0;
+        var changes = actionHistory.filter(function(action) {return action.id >= lastActionID;});
         res.json(changes);
     });
 
@@ -104,7 +108,7 @@ module.exports = function(port, middleware, callback) {
     });
 
     return {
-        close: function(callback) {
+        close: function(callback) {//assada
             connections.forEach(function(connection) {
                 connection.destroy();
             });
