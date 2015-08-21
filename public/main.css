@@ -134,11 +134,23 @@ input[type="checkbox"]:checked + label  {
 }
 
 .topRowDecoraction{
-  padding-left: 10px;
+  padding-left: 4px;
+}
+
+.checkbox-div{
+  padding-right: 0px;
+  width: 29px;
+}
+.title-div{
+  padding-left: 2px;
 }
 
 .list-group-item{
   border: none;
+}
+
+.todo-list-group{
+  margin-bottom: 0px
 }
 
 .wee-x-there{

@@ -20,14 +20,7 @@
                     <button type="radio" class="btn btn-default" name="filter" value="active" onClick="filter(this.value)" />Active<br />
                     <button type="radio" class="btn btn-default" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
                 </div>
-                <form id="todo-form">
-                    <div class="form-inline">
-                        <div class="form-group">
-                            <input id="new-todo" class="form-control" placeholder="What needs to be done?" autofocus>
-                        </div>
-                        <input class="btn btn-default" id="submit-todo" type="submit" value="Create">
-                    </div>
-                </form>
+               
                 <div class="buttonsDiv">
                     <br />
                     <button class="btn btn-default" onclick="deleteCompleted()">Delete Completed</button>
@@ -41,29 +34,15 @@
                             <div class="col-md-10">
                                 <section>
                                     <h2 id="todo-list-placeholder">Loading...</h2>
-                                    <ul  class="list-group" id="todo-list"></ul>
+                                    <ul  class="list-group todo-list-group" id="todo-list"></ul>
+                                     <form id="todo-form">
+                                        <div class="input-group">
+                                            <input id="new-todo" class="form-control background-coloured" placeholder="What needs to be done?" autofocus>
+                                            <span class="input-group-btn">
+                                            <button class="btn btn-default" id="submit-todo" type="submit" value="Create">Search</button>
+                                        </div>
+                                    </form>
                                 </section>
-                               <!--  <ul  class="list-group">
-                                     <li class="list-group-item background-coloured">
-                                         <div class="row">
-                                           ---------------------------------------------------------------------- 
-                                           <input type="button" class=" btn btn-success btn-small" />
-                                         </div>
-                                         <div class="row">
-                                            <div class="col-md-1">
-                                                <input type="checkbox" id="c1" />
-                                                <label for="c1"><span></span></label>
-                                            </div>
-                                            <div class="col-md-10">
-                                                this all the text
-                                            </div>
-                                            <div class="col-md-1">
-                                                
-                                            </div>
-                                         </div>
-
-                                     </li>
-                                 </ul> -->
                             </div>
                         </div>
                     </div>

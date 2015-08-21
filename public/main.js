@@ -20,7 +20,8 @@ var todoMain = function (){
         currentFilter = type;
         for (var i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
-            if ((" " + li.className + " ").indexOf(" completed ") > -1) {
+            var textDiv = document.getElementById(li.getAttribute("for"));
+            if ((" " + textDiv.className + " ").indexOf(" completed ") > -1) {
                 li.style.display = type === "active" ? "none" : "block";
             } else {
                 li.style.display = type === "complete" ? "none" : "block";
@@ -170,7 +171,7 @@ var todoMain = function (){
 
     function renderList(){
         var todoListBuff = document.createElement("ul");
-        todoListBuff.className = "list-group"
+        todoListBuff.className = "list-group todo-list-group"
         todoListBuff.id  = "todo-list";
         var parent = todoList.parentNode;
 
@@ -198,6 +199,7 @@ var todoMain = function (){
         var x = String.fromCharCode(160)
         var listItem = document.createElement("li");
         listItem.className = "list-group-item background-coloured"
+        listItem.setAttribute("for", "text" + todo.id);
 
         var row1 = createRow();
         row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------";
@@ -223,7 +225,7 @@ var todoMain = function (){
 
         /*second row checkbox*/
         var checkDiv = document.createElement("div");
-        checkDiv.className = "col-md-1";
+        checkDiv.className = "col-md-1 checkbox-div";
 
         var completeBox = document.createElement("input");
         completeBox.type = "checkbox";
@@ -247,7 +249,7 @@ var todoMain = function (){
 
         /*second row text*/
         var textDiv =document.createElement("div");
-        textDiv.className = "col-md-10";
+        textDiv.className = "col-md-10 title-div";
         if (todo.isComplete) {
             textDiv.className += " completed ";
         }else {
@@ -257,9 +259,6 @@ var todoMain = function (){
         textDiv.id = "text" + todo.id;
 
         row2.appendChild(textDiv);
-
-
-        // row2.appendChild(deleteDiv);
 
         listItem.appendChild(row2);
 
