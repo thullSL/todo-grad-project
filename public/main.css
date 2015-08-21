@@ -45,66 +45,6 @@ h1 {
     height:20px;
     vertical-align: middle;
 }
-.left{
-    float: left;
-}
-.right{
-    float: right;
-    display: inline;
-    vertical-align: middle;
-}
-
-#wrapper {
-  padding-left: 250px;
-  transition: all 0.4s ease 0s;
-}
-
-#sidebar-wrapper {
-  margin-left: -250px;
-  left: 250px;
-  width: 250px;
-  position: fixed;
-  height: 100%;
-  overflow-y: auto;
-  z-index: 1000;
-  transition: all 0.4s ease 0s;
-}
-
-#page-content-wrapper {
-  width: 100%;
-}
-
-.sidebar-nav {
-  position: absolute;
-  top: 0;
-  width: 250px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-@media (max-width:767px) {
-
-    #wrapper {
-      padding-left: 0;
-    }
-
-    #sidebar-wrapper {
-      left: 0;
-    }
-
-    #wrapper.active {
-      position: relative;
-      left: 250px;
-    }
-
-    #wrapper.active #sidebar-wrapper {
-      left: 250px;
-      width: 250px;
-      transition: all 0.4s ease 0s;
-    }
-
-}
 
 .background-coloured{
     background-color: black;
@@ -159,3 +99,60 @@ input[type="checkbox"]:checked + label  {
     left: -5px;
     font-size: 10px;
 }
+
+.btn-fill{
+  width:100%;
+
+}
+
+.title-bar{
+  background-color: #6C879C;
+}
+
+.padding-0{
+  padding: 0px;
+}
+
+.app-name{
+  background-color: #9E2D2D;
+}
+
+* {
+  font-family: "Source Code Pro";
+}
+
+.btn{
+  border-radius: 0px;
+}
+
+.framing{
+    border-color: #C5BBBB;
+    border-width: 35px;
+    border-style: groove;
+        border-radius: 16px;
+    height: 100%;
+}
+
+.button-clear{
+
+}
+.container{
+  display: flex;
+  flex-direction: column;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.growing-row{
+  flex-grow: 1;
+  background-color: black;
+}
+.glowing-screen{
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  border-color: #9ecaed;
+  box-shadow: 0 0 20px #DCEEEF;;
+}
+html { height:100%; }
+body { position:absolute; top:0; bottom:0; right:0; left:0; }

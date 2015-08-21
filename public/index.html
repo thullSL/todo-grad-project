@@ -6,51 +6,57 @@
         <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/bootstrap.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
         <link href="main.css" rel="stylesheet" type="text/css">
         <link rel="icon" type="image/ico" href="favicon.ico">
     </head>
     <body>
-        <div id="wrapper">
-            <div id="sidebar-wrapper">
-                 <header>
-                    <h1>TODO List</h1>
-                </header>
-                <div class="filtration btn-group-vertical" role="group" aria-label="Filter">
-                    <button type="radio" class="btn btn-default" autofocus="true" name="filter" value="all" onClick="filter(this.value)" checked/>All<br />
-                    <button type="radio" class="btn btn-default" name="filter" value="active" onClick="filter(this.value)" />Active<br />
-                    <button type="radio" class="btn btn-default" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
-                </div>
-               
-                <div class="buttonsDiv">
-                    <br />
-                    <button class="btn btn-default" onclick="deleteCompleted()">Delete Completed</button>
-                </div>
-                <div id="count-label"></div>
-            </div>
-            <div id="page-content-wrapper">
-                <div class="page-content">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-md-10">
-                                <section>
-                                    <h2 id="todo-list-placeholder">Loading...</h2>
-                                    <ul  class="list-group todo-list-group" id="todo-list"></ul>
-                                     <form id="todo-form">
-                                        <div class="input-group">
-                                            <input id="new-todo" class="form-control background-coloured" placeholder="What needs to be done?" autofocus>
-                                            <span class="input-group-btn">
-                                            <button class="btn btn-default" id="submit-todo" type="submit" value="Create">Search</button>
-                                        </div>
-                                    </form>
-                                </section>
-                            </div>
+        <div class="container framing">
+            <div class="glowing-screen">
+                 <div class="title-bar">
+                    <div class="col-md-2 app-name">
+                        <h5>TODO List</h5>
+                    </div>
+                    <div class="col-md-1 padding-0">
+                        <div class="filtration btn-group" role="group" aria-label="Filter">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-filter" ></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button type="radio" class="btn-fill"  name="filter" value="all" onClick="filter(this.value)">All</button></li>
+                                <li><button type="radio" class="btn-fill" name="filter" value="active" onClick="filter(this.value)" >Active</button></li>
+                                <li><button type="radio" class="btn-fill" name="filter" value="complete" onClick="filter(this.value)" >Completed</button></li>
+                            </ul>
                         </div>
                     </div>
+                    <div class="col-md-8">
+                        <h5 class="text-center" id="count-label"></h5>
+                    </div>
+                    
+                    <div class="col-md-1 padding-0">
+                        <div class="buttonsDiv">
+                            <button class="btn btn-default btn-clear pull-right" onclick="deleteCompleted()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="growing-row">
+                    <h2 id="todo-list-placeholder">Loading...</h2>
+                    <ul  class="list-group todo-list-group" id="todo-list"></ul>
+                </div>
+                <div class="">
+                     <form id="todo-form">
+                        <div class="input-group padding-0">
+                            <input id="new-todo" class="form-control background-coloured" placeholder="What needs to be done?" autofocus>
+                            <span class="input-group-btn"/>
+                            <button class="btn btn-default" id="submit-todo" type="submit" value="Create">Search</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-<div id="messages" disabled="true"></div>
+        <div id="messages" disabled="true"></div>
         <script type="text/javascript" src="main.js"></script>
     </body>
 </html>
+
