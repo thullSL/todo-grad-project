@@ -76,6 +76,7 @@ var todoMain = function (){
             renderMessageDialog("error", "Failed to create item. Server returned " +
                     error.status + " - " + error.responseText);
         });
+        document.getElementById("scrollToMe").scrollIntoView();
     }
     function performActions(actions) {
         actions.forEach(function(actionOb) {
@@ -190,7 +191,7 @@ var todoMain = function (){
             });
         }
     }
-   
+
     function reloadTodoList() {
         getTodoList(renderList);
     }
@@ -242,7 +243,7 @@ var todoMain = function (){
         var deleteButton = document.createElement("button");
         deleteButton.id = "deleteTODO" + i;
         deleteButton.onclick = function(){
-            deleteTodo(todo.id);   
+            deleteTodo(todo.id);
         };
         deleteButton.className  = "deleteButton btn btn-danger btn-small-square";
         // deleteButton.textContent = "X"
@@ -268,7 +269,7 @@ var todoMain = function (){
         completeBox.setAttribute("for", "text" + todo.id);
         completeBox.className = " btn-checkbox";
         completeBox.textContent = "$";
-        if(todo.isComplete) {            
+        if(todo.isComplete) {
             completeBox.className += " active ";
             completeBox.textContent = "#";
         }
@@ -327,7 +328,7 @@ var todoMain = function (){
             throw error;
         }
     }
-  
+
     function parseJSON(response) {
         return response.json();
     }

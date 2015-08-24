@@ -15,3 +15,7 @@
 	left: -8px;
 
 }
+.input-group-lg > .form-control, .input-group-lg > .input-group-addon, .input-group-lg > .input-group-btn > .btn{
+  height: 62px;
+  font-size: 30px;
+}
