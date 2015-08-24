@@ -84,6 +84,9 @@ input[type="checkbox"]:checked + label  {
 .title-div{
   padding-left: 2px;
 }
+.title-div.error{
+  color: #FF0000;
+}
 
 .list-group-item{
   border: none;
@@ -173,6 +176,7 @@ input[type="checkbox"]:checked + label  {
 .growing-row{
   flex-grow: 1;
   background-color: black;
+  overflow: auto;
 }
 .glowing-screen{
   flex-grow: 1;
@@ -181,8 +185,12 @@ input[type="checkbox"]:checked + label  {
   border-radius: 10px;
   overflow: hidden;
   border-color: #9ecaed;
-  box-shadow: 0 0 20px #DCEEEF;
+  box-shadow: 0 0 20px #778C5A;
 
+}
+
+#messages{
+  display: none;
 }
 html { height:100%; }
 body { position:absolute; top:0; bottom:0; right:0; left:0; }

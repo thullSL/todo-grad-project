@@ -14,11 +14,13 @@ var todoMain = function (){
     var currentFilter = document.getElementsByClassName("btn-drop-filter")[0];
     var lastActionID = 0;
     var self = this;
+    var nextErrorId = 0;
+    var messages = new Map();
 
 
     this.filter = function(actionElement) {
         currentFilter = actionElement;
-        type = actionElement.value;
+        var type = actionElement.value;
         var buts = document.getElementsByClassName("btn-drop-filter");
 
         for(var i = 0; i < buts.length; i++) {
@@ -27,7 +29,7 @@ var todoMain = function (){
         actionElement.className += " active ";
 
 
-        for (var i = 0; i < todoList.childNodes.length; i++) {
+        for (i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
             var textDiv = document.getElementById(li.getAttribute("for"));
             if ((" " + textDiv.className + " ").indexOf(" completed ") > -1) {
@@ -56,6 +58,12 @@ var todoMain = function (){
     };
 
     function createTodo(title) {
+        function optimisticCreateTodo(response){
+            var loc = response.headers.get("location");
+            var id = loc.substring(loc.lastIndexOf("/") + 1);
+            todosLocal.set(id, {id : id, title : title, isComplete : false});
+        }
+
         fetch("/api/todo", {
             method: "post",
             headers: {"Content-type": "application/json"},
@@ -68,12 +76,6 @@ var todoMain = function (){
             renderMessageDialog("error", "Failed to create item. Server returned " +
                     error.status + " - " + error.responseText);
         });
-
-        function optimisticCreateTodo(response){
-            var loc = response.headers.get("location");
-            var id = loc.substring(loc.lastIndexOf("/") + 1);
-            todosLocal.set(id, {id : id, title : title, isComplete : false});
-        }
     }
     function performActions(actions) {
         actions.forEach(function(actionOb) {
@@ -132,22 +134,7 @@ var todoMain = function (){
 
     function updateTodo(element, todoId) {
         var  todo = todosLocal.get(todoId.toString());
-        fetch("/api/todo/" + todo.id, {
-            method : "put",
-            headers : {"Content-type" : "application/json"},
-            body : JSON.stringify({
-                title: todo.title,
-                isComplete: element.checked
-            })
-        })
-        .then(checkStatus)
-        .then(optimisticUpdatTodo)
-        .catch(function(error) {
-                renderMessageDialog("error", "Failed to update item " +
-                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-        });
-
-        function optimisticUpdatTodo(data){
+        function optimisticUpdatTodo(data) {
             todo.isComplete = element.checked;
             var textElm = document.getElementById(element.getAttribute("for"));
             if (element.checked) {
@@ -156,21 +143,42 @@ var todoMain = function (){
                 textElm.className = textElm.className.replace(" completed ", "");
             }
         }
+        if(todo !== undefined) {
+            fetch("/api/todo/" + todo.id, {
+                method : "put",
+                headers : {"Content-type" : "application/json"},
+                body : JSON.stringify({
+                    title: todo.title,
+                    isComplete: element.checked
+                })
+            })
+            .then(checkStatus)
+            .then(optimisticUpdatTodo)
+            .catch(function(error) {
+                    renderMessageDialog("error", "Failed to update item " +
+                        todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+            });
+        }
     }
 
     function deleteTodo(todoId, callback) {
-        fetch("/api/todo/" + todoId , {method: "delete"})
-        .then(checkStatus)
-        .then(optimisticDeleteTodo)
-        .then(callback)
-        .catch(function(error) {
-            renderMessageDialog("error", "Failed to delete item " +
-                todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-            callback();
-        });
-         function optimisticDeleteTodo(response){
+        function optimisticDeleteTodo(response){
              todosLocal.delete(todoId.toString());
-            renderList(todosLocal);
+            renderList();
+        }
+        if(messages.get(todoId) !== undefined) {
+            messages.delete(todoId);
+            renderList();
+        }else {
+            fetch("/api/todo/" + todoId , {method: "delete"})
+            .then(checkStatus)
+            .then(optimisticDeleteTodo)
+            .then(callback)
+            .catch(function(error) {
+                renderMessageDialog("error", "Failed to delete item " +
+                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+                callback();
+            });
         }
     }
    
@@ -190,11 +198,19 @@ var todoMain = function (){
         var promises = [];
         for (var todo of todosLocal.values()) {
             promises.push(new Promise(function(resolve, reject) {
-                renderTodo(todoListBuff, todo, i);
+                renderTodo(todoListBuff, todo, i, "todo");
                 i++;
                 resolve();
             }));
         }
+        for (var message of messages.values()) {
+            promises.push(new Promise(function(resolve, reject) {
+                renderTodo(todoListBuff, message, i, message.type);
+                i++;
+                resolve();
+            }));
+        }
+
         Promise.all(promises).then(function() {
             document.getElementById("count-label").textContent = "Total ToDos left to do: " +
                                                                 incompleteTodoCount.toString();
@@ -204,14 +220,14 @@ var todoMain = function (){
         });
     }
 
-    function renderTodo(ul, todo, i) {
+    function renderTodo(ul, todo, i, type) {
         var x = String.fromCharCode(160);
         var listItem = document.createElement("li");
         listItem.className = "list-group-item background-coloured";
         listItem.setAttribute("for", "text" + todo.id);
 
         var row1 = createRow();
-        row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------" + x + x;
+        row1.textContent = "# !/bin/" + type + x + x + x + x + " -----------------" + x + x;
         row1.className = "topRowDecoraction";
 
         var deleteButton = document.createElement("button");
@@ -231,7 +247,7 @@ var todoMain = function (){
 
         /*second row of todo*/
         var row2 = createRow();
-        row2.className = "display-flex"
+        row2.className = "display-flex";
 
         /*second row checkbox*/
         var checkDiv = document.createElement("div");
@@ -259,7 +275,7 @@ var todoMain = function (){
 
         /*second row text*/
         var textDiv =document.createElement("div");
-        textDiv.className = "flex-grow-2 title-div";
+        textDiv.className = "flex-grow-2 title-div " + type;
         if (todo.isComplete) {
             textDiv.className += " completed ";
         }else {
@@ -282,6 +298,11 @@ var todoMain = function (){
     }
 
     function renderMessageDialog(type, message) {
+        var todoListBuff = document.createElement("ul");
+        var messageOb = {type: type, title : message, id : "error" + nextErrorId ++, isComplete : false};
+        messages.set(messageOb.id, messageOb);
+        renderTodo(todoList, messageOb,0, type);
+
         messagesDiv.disabled = false;
         type = type === undefined ? "error" : type;
         var div = document.createElement("div");
