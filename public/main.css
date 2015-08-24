@@ -79,7 +79,7 @@ input[type="checkbox"]:checked + label  {
 
 .checkbox-div{
   padding-right: 0px;
-  width: 29px;
+  width: 16px;
 }
 .title-div{
   padding-left: 2px;
@@ -100,9 +100,21 @@ input[type="checkbox"]:checked + label  {
     font-size: 10px;
 }
 
-.btn-fill{
+.btn-drop{
   width:100%;
+  border-style: none;
+}
 
+.btn-drop:hover{
+  background-color: #6C879C;
+}
+
+.btn-drop-filter.active{
+  background-color: #265D39;
+}
+
+.dropdown-menu{
+  padding:0;
 }
 
 .title-bar{
@@ -116,6 +128,7 @@ input[type="checkbox"]:checked + label  {
 
 .app-name{
   background-color: #9E2D2D;
+  text-align: center;
 }
 
 * {
@@ -127,15 +140,19 @@ input[type="checkbox"]:checked + label  {
 }
 
 .framing{
-    border-color: #C5BBBB;
+    border-color: #2F2E2E;
     border-width: 35px;
     border-style: groove;
-        border-radius: 16px;
+    border-radius: 16px;
     height: 100%;
 }
 
 .button-clear{
 
+}
+
+.display-flex{
+  display: flex;
 }
 
 .flex-grow-1{
@@ -151,6 +168,7 @@ input[type="checkbox"]:checked + label  {
   flex-direction: column;
   padding-left: 0px;
   padding-right: 0px;
+  background-color: black;
 }
 .growing-row{
   flex-grow: 1;
@@ -160,9 +178,11 @@ input[type="checkbox"]:checked + label  {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  border-radius: 2px;
+  border-radius: 10px;
+  overflow: hidden;
   border-color: #9ecaed;
-  box-shadow: 0 0 20px #DCEEEF;;
+  box-shadow: 0 0 20px #DCEEEF;
+
 }
 html { height:100%; }
 body { position:absolute; top:0; bottom:0; right:0; left:0; }

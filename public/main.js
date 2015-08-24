@@ -11,13 +11,22 @@ var todoMain = function (){
     var messagesDiv = document.getElementById("messages");
     var incompleteTodoCount = 0;
     var todosLocal = new Map();
-    var currentFilter = "all";
+    var currentFilter = document.getElementsByClassName("btn-drop-filter")[0];
     var lastActionID = 0;
     var self = this;
 
 
-    this.filter = function(type) {
-        currentFilter = type;
+    this.filter = function(actionElement) {
+        currentFilter = actionElement;
+        type = actionElement.value;
+        var buts = document.getElementsByClassName("btn-drop-filter");
+
+        for(var i = 0; i < buts.length; i++) {
+            buts[i].className = buts[i].className.replace(" active ", "");
+        }
+        actionElement.className += " active ";
+
+
         for (var i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
             var textDiv = document.getElementById(li.getAttribute("for"));
@@ -202,7 +211,7 @@ var todoMain = function (){
         listItem.setAttribute("for", "text" + todo.id);
 
         var row1 = createRow();
-        row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------";
+        row1.textContent = "# !/bin/todo" + x + x + x + x + " -----------------" + x + x;
         row1.className = "topRowDecoraction";
 
         var deleteButton = document.createElement("button");
@@ -222,10 +231,11 @@ var todoMain = function (){
 
         /*second row of todo*/
         var row2 = createRow();
+        row2.className = "display-flex"
 
         /*second row checkbox*/
         var checkDiv = document.createElement("div");
-        checkDiv.className = "col-md-1 checkbox-div";
+        checkDiv.className = "checkbox-div";
 
         var completeBox = document.createElement("input");
         completeBox.type = "checkbox";
@@ -249,7 +259,7 @@ var todoMain = function (){
 
         /*second row text*/
         var textDiv =document.createElement("div");
-        textDiv.className = "col-md-10 title-div";
+        textDiv.className = "flex-grow-2 title-div";
         if (todo.isComplete) {
             textDiv.className += " completed ";
         }else {
