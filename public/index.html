@@ -26,17 +26,19 @@
         <meta name="msapplication-TileColor" content="#ffffff">
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
         <meta name="theme-color" content="#ffffff">
+
+        <link rel="stylesheet" media=" only screen and (min-width: 641px) and (max-width: 1000px)"  href="css/phone.css">
     </head>
     <body>
         <div class="container framing">
             <div class="glowing-screen">
                  <div class="title-bar">
                     <div class="app-name flex-grow-1">
-                        <h5 id="header">TODO List</h5>
+                        <h3 id="header">TODO List</h3>
                     </div>
                     <div class="padding-0">
                         <div class="filtration btn-group" role="group" aria-label="Filter">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="glyphicon glyphicon-filter" ></span>
                             </button>
                             <ul class="dropdown-menu">
@@ -47,12 +49,12 @@
                         </div>
                     </div>
                     <div class="flex-grow-2">
-                        <h5 class="text-center" id="count-label"></h5>
+                        <h3 class="text-center" id="count-label"></h3>
                     </div>
                     
                     <div class="padding-0">
                         <div class="buttonsDiv">
-                            <button class="btn btn-default btn-clear pull-right" onclick="deleteCompleted()">Clear</button>
+                            <button class="btn btn-default btn-lg btn-clear pull-right" onclick="deleteCompleted()">Clear</button>
                         </div>
                     </div>
                 </div>
@@ -62,7 +64,7 @@
                 </div>
                 <div class="">
                      <form id="todo-form">
-                        <div class="input-group padding-0">
+                        <div class="input-group input-group-lg padding-0">
                             <input id="new-todo" class="form-control background-coloured" placeholder="What needs to be done?" autofocus>
                             <span class="input-group-btn"/>
                             <button class="btn btn-default" id="submit-todo" type="submit" value="Create">Search</button>

@@ -134,10 +134,19 @@ var todoMain = function (){
 
     function updateTodo(element, todoId) {
         var  todo = todosLocal.get(todoId.toString());
+        var checked = element.className.indexOf(" active ") < 0 ;
+        if(!checked){
+            element.className = element.className.replace(" active ", "");
+            element.textContent = "#";
+        }else{
+            element.className += " active ";
+            element.textContent = "$";
+        }
+
         function optimisticUpdatTodo(data) {
-            todo.isComplete = element.checked;
+            todo.isComplete = checked;
             var textElm = document.getElementById(element.getAttribute("for"));
-            if (element.checked) {
+            if (checked) {
                 textElm.className += " completed ";
             } else {
                 textElm.className = textElm.className.replace(" completed ", "");
@@ -149,7 +158,7 @@ var todoMain = function (){
                 headers : {"Content-type" : "application/json"},
                 body : JSON.stringify({
                     title: todo.title,
-                    isComplete: element.checked
+                    isComplete: checked
                 })
             })
             .then(checkStatus)
@@ -227,7 +236,7 @@ var todoMain = function (){
         listItem.setAttribute("for", "text" + todo.id);
 
         var row1 = createRow();
-        row1.textContent = "# !/bin/" + type + x + x + x + x + " -----------------" + x + x;
+        row1.textContent = "# !/bin/" + type + x + todo.id + x + x;
         row1.className = "topRowDecoraction";
 
         var deleteButton = document.createElement("button");
@@ -235,7 +244,7 @@ var todoMain = function (){
         deleteButton.onclick = function(){
             deleteTodo(todo.id);   
         };
-        deleteButton.className  = "deleteButton btn btn-danger btn-small-sqaure";
+        deleteButton.className  = "deleteButton btn btn-danger btn-small-square";
         // deleteButton.textContent = "X"
         var deleteSpan = document.createElement("span");
         deleteSpan.className = "glyphicon glyphicon-remove wee-x-there";
@@ -253,23 +262,21 @@ var todoMain = function (){
         var checkDiv = document.createElement("div");
         checkDiv.className = "checkbox-div";
 
-        var completeBox = document.createElement("input");
-        completeBox.type = "checkbox";
-        completeBox.checked = todo.isComplete;
+        var completeBox = document.createElement("button");
+        // completeBox.type = "button";
         completeBox.id = "cb" + todo.id;
         completeBox.setAttribute("for", "text" + todo.id);
-
-        completeBox.className = "isCompleteCheckbox btn btn-success left";
+        completeBox.className = " btn-checkbox";
+        completeBox.textContent = "$";
+        if(todo.isComplete) {            
+            completeBox.className += " active ";
+            completeBox.textContent = "#";
+        }
         completeBox.onclick = function() {
             updateTodo(completeBox, todo.id);
         };
 
         checkDiv.appendChild(completeBox);
-
-        var label = document.createElement("label");
-        label.setAttribute("for", "cb" + todo.id);
-
-        checkDiv.appendChild(label);
 
         row2.appendChild(checkDiv);
 

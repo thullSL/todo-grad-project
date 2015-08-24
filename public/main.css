@@ -66,7 +66,7 @@ input[type="checkbox"]:checked + label  {
     background:url(check_radio_sheet.png) -19px top no-repeat;
 }
 
-.btn-small-sqaure{
+.btn-small-square{
   padding: 1px 6px;
   height: 10px;
   width: 10px;
@@ -77,12 +77,21 @@ input[type="checkbox"]:checked + label  {
   padding-left: 4px;
 }
 
-.checkbox-div{
-  padding-right: 0px;
-  width: 16px;
+.btn-checkbox{
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+.btn-checkbox.active{
+  color: gray;
+  border: none;
 }
 .title-div{
   padding-left: 2px;
+}
+
+.title-bar h3{
+  margin-top: 10px;
 }
 .title-div.error{
   color: #FF0000;

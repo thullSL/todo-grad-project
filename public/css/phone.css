@@ -1,0 +1,17 @@
+* {
+    font-family: "Source Code Pro";
+    font-size: larger;
+}
+
+.btn-small-square{
+
+	height: 30px;
+    width: 30px;
+}
+
+.wee-x-there{
+	font-size: 30px;
+	top:-3px;
+	left: -8px;
+
+}
