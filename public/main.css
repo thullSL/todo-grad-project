@@ -136,6 +136,7 @@ input[type="checkbox"]:checked + label  {
 
 * {
   font-family: "Source Code Pro";
+  font-size: large;
 }
 
 .btn{
@@ -172,6 +173,7 @@ input[type="checkbox"]:checked + label  {
   padding-left: 0px;
   padding-right: 0px;
   background-color: black;
+  width: 100%
 }
 .growing-row{
   flex-grow: 1;
