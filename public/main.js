@@ -326,6 +326,6 @@ var todoMain = function (){
     }
 
     reloadTodoList();
-    //var timedReload = window.setInterval(reloadTodoList, 1000);
+    var timedReload = window.setInterval(reloadTodoList, 1000);
 };
 todoMain();
