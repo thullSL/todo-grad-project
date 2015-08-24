@@ -107,6 +107,7 @@ input[type="checkbox"]:checked + label  {
 
 .title-bar{
   background-color: #6C879C;
+  display: flex;
 }
 
 .padding-0{
@@ -136,6 +137,15 @@ input[type="checkbox"]:checked + label  {
 .button-clear{
 
 }
+
+.flex-grow-1{
+  flex-grow: 1;
+}
+
+.flex-grow-2{
+  flex-grow: 5;
+}
+
 .container{
   display: flex;
   flex-direction: column;
