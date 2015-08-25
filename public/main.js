@@ -11,18 +11,31 @@ var todoMain = function (){
     var messagesDiv = document.getElementById("messages");
     var incompleteTodoCount = 0;
     var todosLocal = new Map();
-    var currentFilter = "all";
+    var currentFilter = document.getElementsByClassName("btn-drop-filter")[0];
     var lastActionID = 0;
     var self = this;
+    var nextErrorId = 0;
+    var messages = new Map();
 
-    this.filter = function(type) {
-        currentFilter = type;
-        for (var i = 0; i < todoList.childNodes.length; i++) {
+
+    this.filter = function(actionElement) {
+        currentFilter = actionElement;
+        var type = actionElement.value;
+        var buts = document.getElementsByClassName("btn-drop-filter");
+
+        for(var i = 0; i < buts.length; i++) {
+            buts[i].className = buts[i].className.replace(" active ", "");
+        }
+        actionElement.className += " active ";
+
+
+        for (i = 0; i < todoList.childNodes.length; i++) {
             var li = todoList.childNodes[i];
-            if ((" " + li.className + " ").indexOf(" completed ") > -1) {
-                li.style.display = type === "active" ? "none" : "list-item";
+            var textDiv = document.getElementById(li.getAttribute("for"));
+            if ((" " + textDiv.className + " ").indexOf(" completed ") > -1) {
+                li.style.display = type === "active" ? "none" : "block";
             } else {
-                li.style.display = type === "complete" ? "none" : "list-item";
+                li.style.display = type === "complete" ? "none" : "block";
             }
         }
     };
@@ -45,6 +58,12 @@ var todoMain = function (){
     };
 
     function createTodo(title) {
+        function optimisticCreateTodo(response){
+            var loc = response.headers.get("location");
+            var id = loc.substring(loc.lastIndexOf("/") + 1);
+            todosLocal.set(id, {id : id, title : title, isComplete : false});
+        }
+
         fetch("/api/todo", {
             method: "post",
             headers: {"Content-type": "application/json"},
@@ -57,12 +76,7 @@ var todoMain = function (){
             renderMessageDialog("error", "Failed to create item. Server returned " +
                     error.status + " - " + error.responseText);
         });
-
-        function optimisticCreateTodo(response){
-            var loc = response.headers.get("location");
-            var id = loc.substring(loc.lastIndexOf("/") + 1);
-            todosLocal.set(id, {id : id, title : title, isComplete : false});
-        }
+        document.getElementById("scrollToMe").scrollIntoView();
     }
     function performActions(actions) {
         actions.forEach(function(actionOb) {
@@ -121,55 +135,70 @@ var todoMain = function (){
 
     function updateTodo(element, todoId) {
         var  todo = todosLocal.get(todoId.toString());
-        fetch("/api/todo/" + todo.id, {
-            method : "put",
-            headers : {"Content-type" : "application/json"},
-            body : JSON.stringify({
-                title: todo.title,
-                isComplete: element.checked
-            })
-        })
-        .then(checkStatus)
-        .then(optimisticUpdatTodo)
-        .catch(function(error) {
-                renderMessageDialog("error", "Failed to update item " +
-                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-        });
+        var checked = element.className.indexOf(" active ") < 0 ;
+        if(!checked){
+            element.className = element.className.replace(" active ", "");
+            element.textContent = "#";
+        }else{
+            element.className += " active ";
+            element.textContent = "$";
+        }
 
-        function optimisticUpdatTodo(data){
-            todo.isComplete = element.checked;
-            if (element.checked) {
-                element.parentNode.className += "completed";
+        function optimisticUpdatTodo(data) {
+            todo.isComplete = checked;
+            var textElm = document.getElementById(element.getAttribute("for"));
+            if (checked) {
+                textElm.className += " completed ";
             } else {
-                element.parentNode.className = element.parentNode.className.replace("completed", "");
+                textElm.className = textElm.className.replace(" completed ", "");
             }
         }
-    }
-
-    
-
-    function deleteTodo(todoId, callback) {
-        fetch("/api/todo/" + todoId , {method: "delete"})
-        .then(checkStatus)
-        .then(optimisticDeleteTodo)
-        .then(callback)
-        .catch(function(error) {
-            renderMessageDialog("error", "Failed to delete item " +
-                todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
-            callback();
-        });
-         function optimisticDeleteTodo(response){
-             todosLocal.delete(todoId.toString());
-            renderList(todosLocal);
+        if(todo !== undefined) {
+            fetch("/api/todo/" + todo.id, {
+                method : "put",
+                headers : {"Content-type" : "application/json"},
+                body : JSON.stringify({
+                    title: todo.title,
+                    isComplete: checked
+                })
+            })
+            .then(checkStatus)
+            .then(optimisticUpdatTodo)
+            .catch(function(error) {
+                    renderMessageDialog("error", "Failed to update item " +
+                        todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+            });
         }
     }
-   
+
+    function deleteTodo(todoId, callback) {
+        function optimisticDeleteTodo(response){
+             todosLocal.delete(todoId.toString());
+            renderList();
+        }
+        if(messages.get(todoId) !== undefined) {
+            messages.delete(todoId);
+            renderList();
+        }else {
+            fetch("/api/todo/" + todoId , {method: "delete"})
+            .then(checkStatus)
+            .then(optimisticDeleteTodo)
+            .then(callback)
+            .catch(function(error) {
+                renderMessageDialog("error", "Failed to delete item " +
+                    todoId.toString() + ". Server returned " + error.status + " - " + error.responseText);
+                callback();
+            });
+        }
+    }
+
     function reloadTodoList() {
         getTodoList(renderList);
     }
 
     function renderList(){
         var todoListBuff = document.createElement("ul");
+        todoListBuff.className = "list-group todo-list-group";
         todoListBuff.id  = "todo-list";
         var parent = todoList.parentNode;
 
@@ -179,11 +208,19 @@ var todoMain = function (){
         var promises = [];
         for (var todo of todosLocal.values()) {
             promises.push(new Promise(function(resolve, reject) {
-                renderTodo(todoListBuff, todo, i);
+                renderTodo(todoListBuff, todo, i, "todo");
                 i++;
                 resolve();
             }));
         }
+        for (var message of messages.values()) {
+            promises.push(new Promise(function(resolve, reject) {
+                renderTodo(todoListBuff, message, i, message.type);
+                i++;
+                resolve();
+            }));
+        }
+
         Promise.all(promises).then(function() {
             document.getElementById("count-label").textContent = "Total ToDos left to do: " +
                                                                 incompleteTodoCount.toString();
@@ -193,37 +230,87 @@ var todoMain = function (){
         });
     }
 
-    function renderTodo(ul, todo, i) {
+    function renderTodo(ul, todo, i, type) {
+        var x = String.fromCharCode(160);
         var listItem = document.createElement("li");
-        listItem.textContent = todo.title;
+        listItem.className = "list-group-item background-coloured";
+        listItem.setAttribute("for", "text" + todo.id);
+
+        var row1 = createRow();
+        row1.textContent = "# !/bin/" + type + x + todo.id + x + x;
+        row1.className = "topRowDecoraction";
 
         var deleteButton = document.createElement("button");
         deleteButton.id = "deleteTODO" + i;
         deleteButton.onclick = function(){
-            deleteTodo(todo.id);   
+            deleteTodo(todo.id);
         };
-        deleteButton.textContent = "X";
-        deleteButton.className  = "deleteButton";
+        deleteButton.className  = "deleteButton btn btn-danger btn-small-square";
+        // deleteButton.textContent = "X"
+        var deleteSpan = document.createElement("span");
+        deleteSpan.className = "glyphicon glyphicon-remove wee-x-there";
+        deleteButton.appendChild(deleteSpan);
 
-        var completeBox = document.createElement("input");
-        completeBox.type = "checkbox";
-        completeBox.checked = todo.isComplete;
-        if (todo.isComplete) {
-            listItem.className += "completed";
-        }else {
-            incompleteTodoCount++;
+        row1.appendChild(deleteButton);
+
+        listItem.appendChild(row1);
+
+        /*second row of todo*/
+        var row2 = createRow();
+        row2.className = "display-flex";
+
+        /*second row checkbox*/
+        var checkDiv = document.createElement("div");
+        checkDiv.className = "checkbox-div";
+
+        var completeBox = document.createElement("button");
+        // completeBox.type = "button";
+        completeBox.id = "cb" + todo.id;
+        completeBox.setAttribute("for", "text" + todo.id);
+        completeBox.className = " btn-checkbox";
+        completeBox.textContent = "$";
+        if(todo.isComplete) {
+            completeBox.className += " active ";
+            completeBox.textContent = "#";
         }
-        completeBox.className = "isCompleteCheckbox";
-        completeBox.onclick = function(){
+        completeBox.onclick = function() {
             updateTodo(completeBox, todo.id);
         };
 
-        listItem.appendChild(deleteButton);
-        listItem.appendChild(completeBox);
+        checkDiv.appendChild(completeBox);
+
+        row2.appendChild(checkDiv);
+
+        /*second row text*/
+        var textDiv =document.createElement("div");
+        textDiv.className = "flex-grow-2 title-div " + type;
+        if (todo.isComplete) {
+            textDiv.className += " completed ";
+        }else {
+            incompleteTodoCount++;
+        }
+        textDiv.textContent = todo.title;
+        textDiv.id = "text" + todo.id;
+
+        row2.appendChild(textDiv);
+
+        listItem.appendChild(row2);
+
         ul.appendChild(listItem);
     }
 
+    function createRow(){
+        var row = document.createElement("div");
+        row.className = "row";
+        return row;
+    }
+
     function renderMessageDialog(type, message) {
+        var todoListBuff = document.createElement("ul");
+        var messageOb = {type: type, title : message, id : "error" + nextErrorId ++, isComplete : false};
+        messages.set(messageOb.id, messageOb);
+        renderTodo(todoList, messageOb,0, type);
+
         messagesDiv.disabled = false;
         type = type === undefined ? "error" : type;
         var div = document.createElement("div");
@@ -241,7 +328,7 @@ var todoMain = function (){
             throw error;
         }
     }
-  
+
     function parseJSON(response) {
         return response.json();
     }

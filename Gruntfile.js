@@ -10,14 +10,14 @@ module.exports = function(grunt) {
     var artifactsLocation = "build_artifacts";
     grunt.initConfig({
         jshint: {
-            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js"],
+            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js", "!public/js/*"],
             options: {
                 jshintrc: true,
                 esnext : true
             }
         },
         jscs: {
-            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js"],
+            all: ["Gruntfile.js", "server.js", "server/**/*.js", "test/**/*.js", "public/**/*.js", "!public/js/*"],
             options: {
                 esnext : true
             }  

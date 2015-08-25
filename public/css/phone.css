@@ -1,0 +1,21 @@
+* {
+    font-family: "Source Code Pro";
+    font-size: larger;
+}
+
+.btn-small-square{
+
+	height: 30px;
+    width: 30px;
+}
+
+.wee-x-there{
+	font-size: 30px;
+	top:-3px;
+	left: -8px;
+
+}
+.input-group-lg > .form-control, .input-group-lg > .input-group-addon, .input-group-lg > .input-group-btn > .btn{
+  height: 62px;
+  font-size: 30px;
+}

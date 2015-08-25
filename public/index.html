@@ -3,33 +3,80 @@
     <head>
         <meta charset="utf-8">
         <title>TODO List</title>
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/bootstrap.js"></script>
+        <script type="text/javascript" src="js/jquery-ui.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
         <link href="main.css" rel="stylesheet" type="text/css">
         <link rel="icon" type="image/ico" href="favicon.ico">
+        <link rel="apple-touch-icon" sizes="57x57" href="icons/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="icons/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="icons/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="icons/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="icons/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="icons/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="icons/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192"  href="icons/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="stylesheet" media=" only screen and (min-width: 641px) and (max-width: 1000px)"  href="css/phone.css">
     </head>
     <body>
-        <header>
-            <h1>TODO List</h1>
-        </header>
-        <div id="count-label"></div>
-        <section>
-            <h2 id="todo-list-placeholder">Loading...</h2>
-            <ul id="todo-list"></ul>
-            <form id="todo-form">
-                <input id="new-todo" placeholder="What needs to be done?" autofocus>
-                <input class="button" id="submit-todo" type="submit" value="Create">
-            </form>
-            <div class="buttonsDiv">
-                <br />
-                <button class="button" onclick="deleteCompleted()">Delete Completed</button>
+        <div class="container framing">
+            <div class="glowing-screen">
+                 <div class="title-bar">
+                    <div class="app-name flex-grow-1">
+                        <h3 id="header">TODO List</h3>
+                    </div>
+                    <div class="padding-0">
+                        <div class="filtration btn-group" role="group" aria-label="Filter">
+                            <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-filter" ></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button type="radio" class=" btn btn-drop btn-drop-filter" name="filter" value="all" onClick="filter(this)">All</button></li>
+                                <li><button type="radio" class="btn btn-drop btn-drop-filter" name="filter" value="active" onClick="filter(this)" >Active</button></li>
+                                <li><button type="radio" class="btn btn-drop btn-drop-filter" name="filter" value="complete" onClick="filter(this)" >Completed</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="flex-grow-2">
+                        <h3 class="text-center" id="count-label"></h3>
+                    </div>
+
+                    <div class="padding-0">
+                        <div class="buttonsDiv">
+                            <button class="btn btn-default btn-lg btn-clear pull-right" onclick="deleteCompleted()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="growing-row">
+                    <h2 id="todo-list-placeholder">Loading...</h2>
+                    <ul  class="list-group todo-list-group" id="todo-list"></ul>
+                    <div id="scrollToMe" ></div>
+                </div>
+                <div class="">
+                     <form id="todo-form">
+                        <div class="input-group input-group-lg padding-0">
+                            <input id="new-todo" class="form-control background-coloured" placeholder="What needs to be done?" autofocus>
+                            <span class="input-group-btn"/>
+                            <button class="btn btn-default" id="submit-todo" type="submit" value="Create">Do</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div id="messages" disabled="true"></div>
-        </section>
-        <div class="filtration">
-            <legend>Filter By</legend>
-            <input type="radio" name="filter" value="all" onClick="filter(this.value)" checked/>All<br />
-            <input type="radio" name="filter" value="active" onClick="filter(this.value)" />Active<br />
-            <input type="radio" name="filter" value="complete" onClick="filter(this.value)" />Completed<br />
         </div>
+
+        <div id="messages" disabled="true"></div>
         <script type="text/javascript" src="main.js"></script>
     </body>
 </html>
